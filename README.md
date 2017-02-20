@@ -1,16 +1,19 @@
 # micropython-lcd160gui
 
+V0.1 20th Feb 2017
+
 Provides a simple touch driven event based GUI interface for the Pyboard when
 used with the official LCD160CR colour display. It is based on the official
 driver and uses uasyncio for scheduling.
 
 It is targeted at hardware control and display applications. GUI objects are
-drawn using graphics primitives rather than by rendering bitmap images. This is
-economical in system resources and ensures that they are scalable. The API is
-via event driven callbacks.
+drawn using graphics primitives rather than by rendering bitmap images. This
+ensures that they are scalable. The API is via event driven callbacks.
 
 For historical reasons the library does not use the fonts internal to the
 device. This does, however, enable arbitrary fonts to be employed.
+
+An extension for plotting simple graphs is described [here](./LPLOT.md).
 
 **Caveat** At the time of writing the official driver contains two minor bugs.
 The version supplied should be used. Secondly, issue #2879 is unresolved. The
@@ -41,6 +44,8 @@ Listbox and dropdown list objects (image on right shows dropdown opened).
 ![Image](images/IMG_2509.JPG)  
 A modal dialog box.  
 
+![Image](images/IMG_2514.JPG) ![Image](images/IMG_2515.JPG)  
+The Plot module: Cartesian and polar graphs.
 
 # Pre requisites
 
@@ -49,10 +54,11 @@ A modal dialog box.
 Before running the GUI the hardware should be tested by working through the
 [tutorial](https://docs.micropython.org/en/latest/pyboard/pyboard/tutorial/lcd160cr_skin.html).
 
-Owing to the size of the library is probably necessary to freeze modules as
-bytecode. Users should therefore be familiar with building Micropython from
-source, and installing Python modules as persistent bytecode. Instructions on
-doing this may be found [here](http://forum.micropython.org/viewtopic.php?f=6&t=1776).
+Owing to the size of the library and depending on the size of your application
+it may be necessary to freeze modules as bytecode. Users should therefore be
+familiar with building Micropython from source, and installing Python modules
+as persistent bytecode. Instructions on doing this may be found
+[here](http://forum.micropython.org/viewtopic.php?f=6&t=1776).
 
 Familiarity with callbacks and event driven programming will assist in developing
 applications.
