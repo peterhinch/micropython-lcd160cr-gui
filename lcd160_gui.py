@@ -468,29 +468,47 @@ class Screen(object):
 
     async def _touchtest(self): # Singleton coro tests all touchable instances
         touch_panel = Screen.tft
-        was_touched = False
         while True:
-# Workround for bug (in hardware?) where rapidly repeated calls returned wrong touched status
             await asyncio.sleep_ms(0)
             touched, x, y = touch_panel.get_touch()
-            if touched != was_touched:
-                for _ in range(5):
-                    await asyncio.sleep_ms(10)
-                    touched, x, y = touch_panel.get_touch()
-                    if touched == was_touched:
-                        break
-                else:
-                    was_touched = touched
-                    if touched:
-                        for obj in Screen.current_screen.touchlist:
-                            if obj.visible and not obj.greyed_out():
-                                obj._trytouch(x, y)
-                    else:
-                        for obj in Screen.current_screen.touchlist:
-                            if obj.was_touched:
-                                obj.was_touched = False # Call _untouched once only
-                                obj.busy = False
-                                obj._untouched()
+            if touched:
+                for obj in Screen.current_screen.touchlist:
+                    if obj.visible and not obj.greyed_out():
+                        obj._trytouch(x, y)
+            else:
+                for obj in Screen.current_screen.touchlist:
+                    if obj.was_touched:
+                        obj.was_touched = False # Call _untouched once only
+                        obj.busy = False
+                        obj._untouched()
+
+# Workround for bug (in hardware?) where rapidly repeated calls returned wrong touched status
+# (issue #2879). This is an unsatisfactory kludge and I've eliminated it. Consequence:
+# long press detection doesn't work
+    #async def _touchtest(self): # Singleton coro tests all touchable instances
+        #touch_panel = Screen.tft
+        #was_touched = False
+        #while True:
+            #await asyncio.sleep_ms(0)
+            #touched, x, y = touch_panel.get_touch()
+            #if touched != was_touched:
+                #for _ in range(5):
+                    #await asyncio.sleep_ms(10)
+                    #touched, x, y = touch_panel.get_touch()
+                    #if touched == was_touched:
+                        #break
+                #else:
+                    #was_touched = touched
+                    #if touched:
+                        #for obj in Screen.current_screen.touchlist:
+                            #if obj.visible and not obj.greyed_out():
+                                #obj._trytouch(x, y)
+                    #else:
+                        #for obj in Screen.current_screen.touchlist:
+                            #if obj.was_touched:
+                                #obj.was_touched = False # Call _untouched once only
+                                #obj.busy = False
+                                #obj._untouched()
 
     def _do_open(self, old_screen): # Aperture overrides
         show_all = True

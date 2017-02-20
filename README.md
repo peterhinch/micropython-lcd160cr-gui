@@ -14,9 +14,7 @@ device. This does, however, enable arbitrary fonts to be employed.
 
 **Caveat** At the time of writing the official driver contains two minor bugs.
 The version supplied should be used. Secondly, issue #2879 is unresolved. The
-library includes an unpleasant workround. Detection of long button presses may
-not be reliable. It is hoped that an official fix will remove the need for the
-workround, which should improve general responsiveness.
+detection of long button presses may not be reliable.
 
 Images from the supplied test programs:
 
@@ -91,8 +89,9 @@ Core files:
  ``from constants import *``).
 
 Optional files used by test programs:
- 1. ``font10.py`` Font file.
- 2. ``font14.py`` Ditto. These are generated from the free font FreeSans.ttf.
+ 1. ``font6.py`` Font file.
+ 2. ``font10.py`` Ditto.
+ 3. ``font14.py`` Ditto. These are generated from the free font FreeSans.ttf.
 
 Test/demo programs:
  1. ``lvst.py`` A test program for vertical linear sliders. Also demos an
