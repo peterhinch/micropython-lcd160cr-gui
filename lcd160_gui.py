@@ -40,30 +40,74 @@ class _A():
 
 ClassType = type(_A)
 
-class ugui_exception(Exception):
+class UguiException(Exception):
     pass
 
 # replaces lambda *_ : None owing to issue #2023
 def dolittle(*_):
     pass
 
+class IFont(object):
+    size = ((4, 5), (6, 7), (8, 8), (9, 13))  # (w, h) for each font
+    def __init__(self, family, scale=0, bold_h=0, bold_v=0):
+        self.bold = (bold_h & 3) | ((bold_v & 3) << 2)
+        self.scale = scale
+        self.width = (scale + 1) * self.size[family][0]
+        self.vheight = (scale + 1) * self.size[family][1]
+        self.family = family
+
+    def stringsize(self, s):
+        return len(s) * self.width, self.vheight
+
+    def render(self, tft, x, y, s, style):
+        tft.set_pos(x, y)
+        tft.set_text_color(tft.rgb(*style[0]), tft.rgb(*style[1]))
+        tft.set_font(self.family, self.scale, self.bold, 0, 0)
+        tft.write(s)
+
+    def height(self):
+        return self.vheight
+
+    def max_width(self):
+        return self.width
+
+    def hmap(self):
+        return True
+
+    def reverse(self):
+        return False
+
+    def monospaced(self):
+        return True
+
+
 def get_stringsize(s, font):
+    if isinstance(font, IFont):
+        return font.stringsize(s)
     hor = 0
     for c in s:
         _, vert, cols = font.get_ch(c)
         hor += cols
     return hor, vert
 
+
+# Style is (fgcolor, bgcolor, font)
 def print_centered(tft, x, y, s, style):
     font = style[2]
     length, height = get_stringsize(s, font)
+    x, y = max(x - length // 2, 0), max(y - height // 2, 0)
+    if isinstance(font, IFont):
+        return font.render(tft, x, y, s, style)
     tft.text_style(style)
-    tft.set_text_pos(max(x - length // 2, 0), max(y - height // 2, 0))
+    tft.set_text_pos(x, y)
     tft.print_string(s)
 
 def print_left(tft, x, y, s, style):
     tft.text_style(style)
     tft.set_text_pos(x, y)
+    font = style[2]
+    if isinstance(font, IFont):
+        return font.render(tft, x, y, s, style)
     tft.print_string(s)
 
 def dim(color, factor): # Dim a color
@@ -99,16 +143,13 @@ class LCD160CR_G(LCD160CR):
         self.text_bgcolor = self.bgcolor
         self.text_fgc = self.fgcolor    # colors used by text rendering allowing for grey status
         self.text_bgc = self.bgcolor
-        self.text_font = None
+        self.text_font = IFont(3)  # Default
 
     def get_fgcolor(self):
         return self.fgcolor
 
     def get_bgcolor(self):
         return self.bgcolor
-
-    def set_font(self, font):
-        self.text_font = font
 
     def _setcolor(self, color):
         if self._is_grey:
@@ -265,6 +306,7 @@ class LCD160CR_G(LCD160CR):
 
     # Save and restore a rect region to a 16 bit array.
     # Regions are inclusive of start and end (to match fill_rectangle)
+    # Takes ~50ms for a typical slider
     def save_region(self, arr, x0, y0, x1, y1):
         n = 0
         for x in range(x0, x1 + 1):
@@ -295,10 +337,11 @@ class LCD160CR_G(LCD160CR):
             self.text_fgc = style[0]
 
             font = style[2]
-            if not font.hmap():
-                raise OSError('Font must be horizontally mapped')
-            if font.height() * font.max_width() * 2 > len(self.glyph_buf):
-                raise OSError('Font too large for buffer')
+            if not isinstance(font, IFont):
+                if not font.hmap():
+                    raise UguiException('Font must be horizontally mapped')
+                if font.height() * font.max_width() * 2 > len(self.glyph_buf):
+                    raise UguiException('Font too large for buffer')
             self.text_font = font  # colors allow for disabled status
 
             return (self.text_fgc, self.text_bgc, self.text_font)
@@ -459,7 +502,7 @@ class Screen(object):
         if Screen.current_screen is None: # Initialising class and coro
             tft = Screen.get_tft()
             if tft.text_font is None:
-                raise OSError('The lcd set_font method has not been called')
+                raise UguiException('The lcd set_font method has not been called')
             loop = asyncio.get_event_loop()
             loop.create_task(self._touchtest()) # One coro only
             loop.create_task(self._garbage_collect())

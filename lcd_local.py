@@ -31,11 +31,9 @@
 # Default 1058 bytes, allowing fonts upto 23*23 pixels (font14.py)
 
 import lcd160cr
-import font10
 from lcd160_gui import Screen, LCD160CR_G
 
 def setup():
     lcd = LCD160CR_G("Y")  # Set connection
     lcd.set_orient(lcd160cr.LANDSCAPE)  # and orientation
-    lcd.set_font(font10)
     Screen.setup(lcd)

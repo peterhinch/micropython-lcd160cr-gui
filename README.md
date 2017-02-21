@@ -1,6 +1,6 @@
 # micropython-lcd160gui
 
-V0.1 20th Feb 2017
+V0.11 21st Feb 2017
 
 Provides a simple touch driven event based GUI interface for the Pyboard when
 used with the official LCD160CR colour display. It is based on the official
@@ -10,14 +10,15 @@ It is targeted at hardware control and display applications. GUI objects are
 drawn using graphics primitives rather than by rendering bitmap images. This
 ensures that they are scalable. The API is via event driven callbacks.
 
-For historical reasons the library does not use the fonts internal to the
-device. This does, however, enable arbitrary fonts to be employed.
+The library can use the fonts internal to the device and also arbitrary fonts
+converted from ``ttf`` or ``otf`` formats.
 
 An extension for plotting simple graphs is described [here](./LPLOT.md).
 
-**Caveat** At the time of writing the official driver contains two minor bugs.
-The version supplied should be used. Secondly, issue #2879 is unresolved. The
-detection of long button presses may not be reliable.
+**Caveat** The official driver ``lcd160cr.py`` should be dated 21st Feb 2017
+or later: use firmware dated on or after 22nd Feb 2017 or build from source.
+Issue #2879 is due to be resolved with a display firmware update; in the
+meantime the detection of long button presses is unreliable.
 
 Images from the supplied test programs:
 
@@ -47,9 +48,9 @@ A modal dialog box.
 ![Image](images/IMG_2514.JPG) ![Image](images/IMG_2515.JPG)  
 The Plot module: Cartesian and polar graphs.
 
-# Pre requisites
+# 1. Pre requisites
 
-## Pre installation
+## 1.1 Pre installation
 
 Before running the GUI the hardware should be tested by working through the
 [tutorial](https://docs.micropython.org/en/latest/pyboard/pyboard/tutorial/lcd160cr_skin.html).
@@ -63,7 +64,7 @@ as persistent bytecode. Instructions on doing this may be found
 Familiarity with callbacks and event driven programming will assist in developing
 applications.
 
-## Library Documentation
+## 1.2 Library Documentation
 
 Documentation for the underlying libraries may be found at these sites.  
 
@@ -76,22 +77,20 @@ Other references:
 [Proposed standard font format](https://github.com/peterhinch/micropython-font-to-py)  
 [uasyncio libraries and notes](https://github.com/peterhinch/micropython-async)  
 
-## Python files
+## 1.3 Python files
 
 Library directory:
- 1. The uasyncio library may be installed as frozen bytecode. Copy ``lib\*``
- containing the uasyncio installation to your frozen modules directory and
- build.
+ 1. The uasyncio library may be copied to the Pyboard or flashed as frozen
+ bytecode. To do this copy ``lib\*`` containing the uasyncio installation to
+ your frozen modules directory and build.
 
 Core files:
- 1. ``lcd160cr.py`` Official driver. Currently a modified version is supplied
- as the official one has a couple of bugs.
- 2. ``asyn.py`` Synchronisation primitives.
- 3. ``aswitch.py`` Provides a Delay_ms class for retriggerable delays.
- 4. ``lcd160_gui.py`` The micro GUI library.
- 5. ``lcd_local.py`` Local hardware definition. This file should be edited to
+ 1. ``asyn.py`` Synchronisation primitives.
+ 2. ``aswitch.py`` Provides a ``Delay_ms`` class for retriggerable delays.
+ 3. ``lcd160_gui.py`` The micro GUI library.
+ 4. ``lcd_local.py`` Local hardware definition. This file should be edited to
  match your hardware.
- 6. ``constants.py`` Constants such as colors and shapes (import using
+ 5. ``constants.py`` Constants such as colors and shapes (import using
  ``from constants import *``).
 
 Optional files used by test programs:
@@ -110,29 +109,27 @@ Test/demo programs:
  disabled controls.
  5. ``ldd.py`` Dropdown list and Listbox controls.
  6. ``ldb.py`` Modal dialog boxes.
+ 7. ``ldb_if.py`` As above but using an internal font.
 
 By the standards of the Pyboard this is a large library. The ``lcd160_gui.py``
-program is too large to be compiled on-board and must be cross-compiled. If
-memory problems are encountered Python code (including font files) should be
-implemented as frozen bytecode. The ``uasyncio`` library may be frozen.
+program is too large to be compiled on-board and must be cross-compiled. The
+test programs have been run with a standard firmware build. If memory problems
+are encountered Python code (including font files) may be implemented as frozen
+bytecode.
 
 It is also wise to issue ctrl-D to soft reset the Pyboard before importing a
 module which uses the library. The test programs require a ctrl-D before import.
 
-Fonts should be created using the ``font_to_py.py`` utility documented
-[here](https://github.com/peterhinch/micropython-font-to-py.git). The ``-x``
-argument should be employed.
+# 2. Concepts
 
-# Concepts
-
-### Terminology
+## 2.1 Terminology
 
 GUI objects are created on a ``Screen`` instance which normally fills the
 entire physical screen. Displayable GUI objects comprise ``control`` and
 ``display`` instances. The former can respond to touch (e.g. ``Pushbutton``
 instances) while the latter cannot (``LED`` or ``Dial`` instances).
 
-### Coordinates
+## 2.2 Coordinates
 
 In common with most displays, the top left hand corner of the display is (0, 0)
 with increasing values of x to the right, and increasing values of y downward.
@@ -141,13 +138,13 @@ sensitive controls this corresponds to the sensitive region. Locations are
 defined as a 2-tuple (x, y). The location of an object is defined as the
 location of the top left hand corner of the bounding box.
 
-### Colors
+## 2.3 Colors
 
 These are defined as a 3-tuple (r, g, b) with values of red, green and blue in
 range 0 to 255. The interface and this document uses the American spelling
 (color) throughout. This is for historical reasons.
 
-### Callbacks
+## 2.4 Callbacks
 
 The interface is event driven. Controls may have optional callbacks which will
 be executed when a given event occurs. A callback function receives positional
@@ -160,7 +157,7 @@ the Screens section for a reason why this is useful.
 All controls and displays have a ``tft`` property which is the ``LCD160CR_G``
 instance. This enables callbacks to access drawing primitives.
 
-### Screens
+## 2.5 Screens
 
 GUI controls and displays are rendered on a ``Screen`` instance. A user program
 may instantiate multiple screens, each with its own set of GUI objects. The
@@ -185,7 +182,7 @@ box.
 
 The ``Screen`` class is configured in ``lcd_local.py``.
 
-# Program Structure
+# 3. Program Structure
 
 The following illustrates the structure of a minimal program:
 ```python
@@ -212,7 +209,16 @@ start the scheduler using that screen object. Control then passes to the
 scheduler: the code following this line will not run until the GUI is shut down
 and the scheduler is stopped (``Screen.shutdown()``).
 
-# Class Screen
+## 3.1 Initialisation
+
+This is performed by ``lcd_local.py`` which instantiates an ``LCD160CR_G``
+display. This class is derived from the official driver's ``LCD160CR`` class:
+the documentation for the latter may be viewed
+[here](http://docs.micropython.org/en/latest/pyboard/library/lcd160cr.html#lcd160cr.LCD160CR.set_spi_win).
+An additional optional constructor keyword argument ``bufsize`` is available.
+See section 8 (Fonts) for its use.
+
+# 4. Class Screen
 
 The ``Screen`` class presents a full-screen canvas onto which displayable
 objects are rendered. Before instantiating GUI objects a ``Screen`` instance
@@ -220,7 +226,7 @@ must be created. This will be current until another is instantiated. When a GUI
 object is instantiated it is associated with the current screen.
 
 The best way to use the GUI, even in single screen programs, is to create a
-user screen by subclassing the ``Screen`` class. GUI objects are instantialited
+user screen by subclassing the ``Screen`` class. GUI objects are instantiated
 in the constructor. This arrangement facilitates communication between objects
 on the screen. The following presents an outline of this approach:
 
@@ -264,7 +270,7 @@ Screen.change(Screen_0)
 Note that the GUI is started by issuing ``Screen.change`` with the class as its
 argument rather than an instance. This aims to minimise RAM usage.
 
-## Class methods
+## 4.1 Class methods
 
 In normal use the following methods only are required:  
  * ``change`` Change screen, refreshing the display. Mandatory positional
@@ -289,11 +295,11 @@ Other method:
 
 See ``lbt.py`` and ``ldb.py`` for examples of multi-screen design.
 
-## Constructor
+## 4.2 Constructor
 
 This takes no arguments.
 
-## Callback Methods
+## 4.3 Callback Methods
 
 These do nothing, and may be defined in subclasses if required.
 
@@ -301,11 +307,11 @@ These do nothing, and may be defined in subclasses if required.
  * ``after_open`` Called after a screen has been displayed.
  * ``on_hide`` Called when a screen ceases to be current.
 
-# Display Classes
+# 5. Display Classes
 
 These classes provide ways to display data and are not touch sensitive.
 
-## Class Label
+## 5.1 Class Label
 
 Displays text in a fixed length field. The height of a label is determined by
 the metrics of the specified font.
@@ -328,7 +334,7 @@ Method:
  * ``value`` Argument ``val`` string, default ``None``. If provided, refreshes
  the label with the passed text otherwise clears the text in the label.
 
-## Class Dial
+## 5.2 Class Dial
 
 Displays angles in a circular dial. Angles are in radians with zero represented
 by a vertical pointer. Positive angles appear as clockwise rotation of the
@@ -355,7 +361,7 @@ Method:
  pointer index exceeds the number of pointers defined by the constructor
  ``pointers`` argument.
 
-## Class LED
+## 5.3 Class LED
 
 Displays a boolean state. Can display other information by varying the color.
 
@@ -376,7 +382,7 @@ Methods:
  * ``color`` Argument ``color``. Change the LED color without altering its
  state.
 
-## Class Meter
+## 5.4 Class Meter
 
 This displays a single value in range 0.0 to 1.0 on a vertical linear meter.
 
@@ -405,14 +411,14 @@ Methods:
  constrained to full scale or 0. Always returns its current value. 
 
 
-# Control Classes
+# 6. Control Classes
 
 These classes provide touch-sensitive objects capable of both the display and
 entry of data. If the user moves the control, its value will change and an
 optional callback will be executed. If another control's callback or a
 coroutine alters a control's value, its appearance will change accordingly.
 
-## Class Slider
+## 6.1 Class Slider
 
 These emulate linear potentiometers. Vertical ``Slider`` and horizontal
 ``HorizSlider`` variants are available. These are constructed and used
@@ -461,7 +467,7 @@ Methods:
  * ``color`` Mandatory arg ``color`` The control is rendered in the selected
  color. This supports dynamic color changes  
 
-## Class Knob
+## 6.2 Class Knob
 
 This emulates a rotary control capable of being rotated through a predefined
 arc.
@@ -499,7 +505,7 @@ Methods:
  correspond to the new value. The move callback will run. The method constrains
  the range to 0.0 to 1.0. Always returns the control's value.
 
-## Class Checkbox
+## 6.3 Class Checkbox
 
 This provides for boolean data entry and display. In the ``True`` state the
 control can show an 'X' or a filled block of any color.
@@ -530,7 +536,7 @@ Methods:
  correspond to the control's current value, updates it; the checkbox is
  re-drawn and the callback executed. Always returns the control's value.
 
-## Class Button
+## 6.4 Class Button
 
 This emulates a pushbutton, with a callback being executed each time the button
 is pressed. Buttons may be any one of three shapes: ``CIRCLE``, ``RECTANGLE``
@@ -572,7 +578,7 @@ Class variables:
  * ``lit_time`` Period in seconds the ``litcolor`` is displayed. Default 1.
  * ``long_press_time`` Press duration for a long press. Default 1 second.
 
-## Class ButtonList: emulate a button with multiple states
+## 6.5 Class ButtonList: emulate a button with multiple states
 
 A ``ButtonList`` groups a number of buttons together to implement a button
 which changes state each time it is pressed. For example it might toggle
@@ -615,7 +621,7 @@ for t in table: # Buttons overlay each other at same location
     bl.add_button((10, 10), font = font14, fontcolor = BLACK, **t)
 ```
 
-## Class RadioButtons
+## 6.6 Class RadioButtons
 
 These comprise a set of buttons at different locations. When a button is
 pressed, it becomes highlighted and remains so until another button is pressed.
@@ -655,7 +661,7 @@ for t in table:
     x += 60 # Horizontal row of buttons
 ```
 
-## Class Listbox
+## 6.7 Class Listbox
 
 The height of a listbox is determined by the number of entries in it and the
 font in use. Scrolling is not supported.
@@ -695,7 +701,7 @@ Methods:
 The callback is triggered whenever a listbox item is pressed, even if that item
 is already currently selected.
 
-## Class Dropdown
+## 6.8 Class Dropdown
 
 A dropdown list. The list, when active, is drawn below the control. The height
 of the control is determined by the height of the font in use. The height of
@@ -735,7 +741,7 @@ Methods:
 The callback is triggered if an item on the dropdown list is touched and that
 item is not currently selected (i.e. when a change occurs).
 
-# Dialog Boxes
+# 7. Dialog Boxes
 
 In general ``Screen`` objects occupy the entire physical display. The principal
 exception to this is modal dialog boxes which are rendered in a window which
@@ -755,7 +761,7 @@ Given coordinates relative to the dialog box, it provides an absolute
 ``location`` 2-tuple suitable as a constructor argument for ``control`` or
 ``display`` classes. See ``ldb.py`` for example usage.
 
-## Class Aperture
+## 7.1 Class Aperture
 
 Provides a window for objects in a modal dialog box.
 
@@ -787,7 +793,7 @@ Class method:
  can query this by implementing an ``on_open`` method which calls
  ``Aperture.value()`` (see ``ldb.py``).
 
-## Class DialogBox
+## 7.2 Class DialogBox
 
 Eases building a dialog box subset based on a row of pushbuttons. Any button
 press will close the dialog. The caller can determine which button was pressed.
@@ -813,11 +819,39 @@ Optional keyword only args:
 Pressing any button closes the dialog and sets the ``Aperture`` value to the
 text of the button pressed or 'Close' in the case of the ``close`` button.
 
-# Developer Notes
+# 8. Fonts
 
-The ``lcd160_gui`` module is large by Pyboard standards. This presents no
-problem if frozen, but if you wish to modify it, freezing is cumbersome.
-Compiling it on the Pyboard will fail owing to RAM limitations. The solution is
-to cross-compile, replacing ugui.py with ugui.mpy on the target. This will work
-with small test programs such as those supplied. Alternatively you may opt to
-split the module into two.
+The LCD160CR contains internal fixed pitch fonts. These may be used as an
+alternative to external fonts converted from ``ttf`` or ``otf`` files and are
+likely to result in better text rendering at small sizes. External fonts enable
+arbitrary fonts to be used including ones with variable pitch.
+
+## 8.1 External fonts
+
+Fonts may be created using the ``font_to_py.py`` utility documented
+[here](https://github.com/peterhinch/micropython-font-to-py.git). The ``-x``
+argument should be employed. The resultant Python file may be imported and
+the module passed to the constructor of GUI objects. These files may be
+frozen as bytecode to radically reduce RAM usage.
+
+The ``LCD160CR_G`` constructor has an optional constructor keyword argument
+``bufsize``. This defines the size of an internal character buffer, required if
+using external fonts. If the largest external font has dimensions h*w pixels
+the buffer must be at least h*w*2 bytes in size. The default of 1058 bytes
+provides for external fonts up to 23*23 pixels.
+
+## 8.2 Internal fonts: Class IFont
+
+To use internal fonts an ``IFont`` is instantiated. The instance is then passed
+to GUI constructors in the same way as for external fonts.
+
+Constructor mandatory positional arg:
+ * ``family`` 0 to 3. Determines the size of the font.
+
+Optional args:
+ * ``scale`` Pixels are drawn as a square with side length equal to scale + 1.
+ The value can be between 0 and 63 (default 0).
+ * ``bold_h`` Controls the number of pixels to overdraw each character pixel in
+ the horizontal direction making a bold effect. Value 0 to 3 (default 0).
+ * ``bold_v`` Controls the number of pixels to overdraw each character pixel in
+ the vertical direction making a bold effect. Value 0 to 3 (default 0).
