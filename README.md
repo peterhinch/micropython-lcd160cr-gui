@@ -288,10 +288,10 @@ In normal use the following methods only are required:
  by a factor of 2.
 
 Other method:  
- * ``get_tft`` Return the ``TFT`` instance. This allows direct drawing to the
- physical screen. Anything so drawn will be lost when the screen is changed. In
- normal use the ``TFT`` instance is acquired via a GUI object's ``tft``
- property.
+ * ``get_tft`` Return the ``LCD160CR`` instance. This allows direct drawing to
+ the physical screen. Anything so drawn will be lost when the screen is
+ changed. In normal use the ``TFT`` instance is acquired via a GUI object's
+ ``tft`` property.
 
 See ``lbt.py`` and ``ldb.py`` for examples of multi-screen design.
 
@@ -372,7 +372,7 @@ Keyword only arguments (all optional):
  * ``height`` Dimension of the square bounding box. Default 20 pixels.
  * ``fgcolor`` Color of border. Defaults to system color.
  * ``bgcolor`` Background color of object. Defaults to system background.
- * ``border`` Border width in pixels - typically 2. If omitted, no border will
+ * ``border`` Border width in pixels - default 2. If ``None``, no border will
  be drawn.
  * ``color`` The color of the LED. Default RED.
 
@@ -447,12 +447,10 @@ Optional keyword only arguments:
  control.
  * ``cb_end`` Callback function which will run when the user stops touching the
  control.
- * ``cbe_args`` A list or tuple of arguments for the above callback. Default
- ``[]``.
+ * ``cbe_args`` A list/tuple of arguments for above callback. Default ``[]``.
  * ``cb_move`` Callback function which will run when the user moves the slider
  or the value is changed programmatically.
- * ``cbm_args`` A list or tuple of arguments for the above callback. Default
- ``[]``.
+ * ``cbm_args`` A list/tuple of arguments for above callback. Default ``[]``.
  * ``value`` The initial value. Default 0.0: slider will be at the bottom (v),
  left (h).
 
@@ -488,12 +486,10 @@ Optional keyword only arguments:
  control.
  * ``cb_end`` Callback function which will run when the user stops touching the
  control.
- * ``cbe_args`` A list or tuple of arguments for the above callback. Default
- ``[]``.
+ * ``cbe_args`` A list/tuple of arguments for above callback. Default ``[]``.
  * ``cb_move`` Callback function which will run when the user moves the knob or
  the value is changed.
- * ``cbm_args`` A list or tuple of arguments for the above callback. Default
- ``[]``.
+ * ``cbm_args`` A list/tuple of arguments for above callback. Default ``[]``.
  * ``value`` Initial value. Default 0.0: knob will be at its most
  counter-clockwise position.
 
@@ -524,8 +520,7 @@ Optional keyword only arguments:
  value (typically 2) is provided, a border line will be drawn around the
  control.
  * ``callback`` Callback function which will run when the value changes.
- * ``args`` A list or tuple of arguments for the above callback. Default
- ``[]``.
+ * ``args`` A list/tuple of arguments for above callback. Default ``[]``.
  * ``value`` Initial value. Default ``False``.
 
 Methods:
@@ -562,12 +557,12 @@ Optional keyword only arguments:
  after being pressed.
  * ``text`` Shown in centre of button. Default: an empty string.
  * ``callback`` Callback function which runs when button is pressed.
- * ``args`` A list of arguments for the above callback. Default ``[]``.
+ * ``args`` A list/tuple of arguments for the above callback. Default ``[]``.
  * ``onrelease`` Default ``True``. If ``True`` the callback will occur when the
  button is released otherwise it will occur when pressed.
  * ``lp_callback`` Callback to be used if button is to respond to a long press.
  Default ``None``.
- * ``lp_args`` A list of arguments for the above callback. Default ``[]``.
+ * ``lp_args`` A list/tuple of arguments for above callback. Default ``[]``.
 
 Method:
  * ``greyed_out`` Optional boolean argument ``val`` default ``None``. If
@@ -686,7 +681,7 @@ Optional keyword only arguments:
  * ``select_color`` Background color for selected item in list. Default
  ``LIGHTBLUE``.
  * ``callback`` Callback function which runs when a list entry is picked.
- * ``args`` A list of arguments for the above callback. Default ``[]``.
+ * ``args`` A list/tuple of arguments for above callback. Default ``[]``.
 
 Methods:
  * ``value`` Argument ``val`` default ``None``. If the argument is provided
@@ -726,7 +721,7 @@ Optional keyword only arguments:
  * ``select_color`` Background color for selected item in list. Default
  ``LIGHTBLUE``.
  * ``callback`` Callback function which runs when a list entry is picked.
- * ``args`` A list of arguments for the above callback. Default ``[]``.
+ * ``args`` A list/tuple of arguments for above callback. Default ``[]``.
 
 Methods:
  * ``value`` Argument ``val`` default ``None``. If the argument is provided
@@ -836,14 +831,18 @@ frozen as bytecode to radically reduce RAM usage.
 
 The ``LCD160CR_G`` constructor has an optional constructor keyword argument
 ``bufsize``. This defines the size of an internal character buffer, required if
-using external fonts. If the largest external font has dimensions h*w pixels
-the buffer must be at least h*w*2 bytes in size. The default of 1058 bytes
-provides for external fonts up to 23*23 pixels.
+using external fonts. If an application's largest external font has dimensions
+``h*w`` pixels, the buffer must be at least ``h*w*2`` bytes in size. The
+default of 1058 bytes provides for external fonts up to 23 by 23 pixels.
+
+A ``UguiException`` will be raised if an application attempts to use a font too
+large for the buffer.
 
 ## 8.2 Internal fonts: Class IFont
 
 To use internal fonts an ``IFont`` is instantiated. The instance is then passed
-to GUI constructors in the same way as for external fonts.
+to GUI constructors in the same way as for external fonts. See test program
+``ldb_if.py`` for an example.
 
 Constructor mandatory positional arg:
  * ``family`` 0 to 3. Determines the size of the font.
