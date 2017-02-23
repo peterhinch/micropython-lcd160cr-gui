@@ -305,20 +305,17 @@ class LCD160CR_G(LCD160CR):
 
     # Save and restore a rect region to a 16 bit array.
     # Regions are inclusive of start and end (to match fill_rectangle)
-    # Takes ~21ms for a typical slider
+    # Takes ~21ms for vert slider ~30ms for horizontal
     def save_region(self, buf, linebuf, x0, y0, x1, y1):
         obuf = memoryview(buf)
         offset = 0
+        ll = len(linebuf) - 1
         for y in range(y0, y1 + 1):
             self.get_line(x0, y, linebuf)
-            ignore = True
-            for b in linebuf:
-                if ignore:
-                    ignore = False
-                else:
-                    obuf[offset] = b
-                    offset += 1
+            obuf[offset : offset + ll] = linebuf[1:]
+            offset += ll
 
+    # 1.1ms
     def restore_region(self, buf, x0, y0, x1, y1):
         self.set_spi_win(x0, y0, x1 - x0 + 1, y1 - y0 + 1)
         self.show_framebuf(buf)
@@ -527,33 +524,6 @@ class Screen(object):
                         obj.busy = False
                         obj._untouched()
 
-# Workround for bug (in hardware?) where rapidly repeated calls returned wrong touched status
-# (issue #2879). This is an unsatisfactory kludge and I've eliminated it. Consequence:
-# long press detection doesn't work
-    #async def _touchtest(self): # Singleton coro tests all touchable instances
-        #touch_panel = Screen.tft
-        #was_touched = False
-        #while True:
-            #await asyncio.sleep_ms(0)
-            #touched, x, y = touch_panel.get_touch()
-            #if touched != was_touched:
-                #for _ in range(5):
-                    #await asyncio.sleep_ms(10)
-                    #touched, x, y = touch_panel.get_touch()
-                    #if touched == was_touched:
-                        #break
-                #else:
-                    #was_touched = touched
-                    #if touched:
-                        #for obj in Screen.current_screen.touchlist:
-                            #if obj.visible and not obj.greyed_out():
-                                #obj._trytouch(x, y)
-                    #else:
-                        #for obj in Screen.current_screen.touchlist:
-                            #if obj.was_touched:
-                                #obj.was_touched = False # Call _untouched once only
-                                #obj.busy = False
-                                #obj._untouched()
 
     def _do_open(self, old_screen): # Aperture overrides
         show_all = True
@@ -1272,7 +1242,7 @@ class HorizSlider(Touchable):
                 dx = width / (self.divisions) # Tick marks
                 for tick in range(self.divisions + 1):
                     xpos = int(x + dx * tick)
-                    tft.draw_vline(xpos, y + 1, dy, self.fgcolor) # TODO Why is +1 fiddle required here?
+                    tft.draw_vline(xpos, y + 1, dy, self.fgcolor)
                     tft.draw_vline(xpos, y + 2 + height // 2,  dy, self.fgcolor) # Add half slot width
 
             if self.legends is not None: # Legends

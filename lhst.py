@@ -58,7 +58,7 @@ class SliderScreen(Screen):
                                   legends = ('0', '5', '10'), cb_end = self.callback,
                                   cbe_args = ('Master',), cb_move = self.master_moved,
                                   value=0.5, border = 2)
-        self.slave = HorizSlider((0, 44), font = font6, fgcolor = GREEN, cbe_args = ('Slave',),
+        self.slave = HorizSlider((0, 44), fgcolor = GREEN, cbe_args = ('Slave',),
                                  cb_move = self.slave_moved, border = 2)
         loop = asyncio.get_event_loop()
         loop.create_task(self.coro())

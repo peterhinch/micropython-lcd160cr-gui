@@ -29,7 +29,7 @@ import font10
 from lcd_local import setup
 from math import pi
 
-# STANDARD BUTTONS
+# STANDARD BUTTON
 
 def quitbutton():
     def quit(button):
@@ -56,19 +56,17 @@ class VerticalSliderScreen(Screen):
                              legends = ('0', '5', '10'), cb_end = self.callback,
                              cbe_args = ('Master',), cb_move = self.master_moved,
                              value=0.5, border = 2)
-        self.slave = Slider((60, 5), font = font6, fgcolor = GREEN, cbe_args = ('Slave',),
+        self.slave = Slider((60, 5), fgcolor = GREEN, cbe_args = ('Slave',),
                             cb_move = self.slave_moved, border = 2)
         loop = asyncio.get_event_loop()
-        loop.create_task(self.thread1())
+        loop.create_task(self.coro())
     # On/Off toggle: enable/disable quit button and one slider
         bs = ButtonList(self.cb_en_dis)
         lst_en_dis = [self.slave, self.master]
-        button = bs.add_button((109, 53), font = font10, fontcolor = BLACK,
-                               fgcolor = GREEN, text = 'Dis',
-                               args = [True, lst_en_dis])
-        button = bs.add_button((109, 53), font = font10, fontcolor = BLACK,
-                               fgcolor = RED, text = 'En',
-                               args = [False, lst_en_dis])
+        button = bs.add_button((109, 53), font = font10, fontcolor = BLACK, fgcolor = GREEN,
+                               text = 'Dis', args = [True, lst_en_dis])
+        button = bs.add_button((109, 53), font = font10, fontcolor = BLACK, fgcolor = RED,
+                               text = 'En', args = [False, lst_en_dis])
 
 # CALLBACKS
 # cb_end occurs when user stops touching the control
@@ -84,7 +82,7 @@ class VerticalSliderScreen(Screen):
         for item in itemlist:
             item.greyed_out(disable)
 
-# Either slave has had its slider moved (by user or by having value altered)
+# Slave has had its slider moved (by user or by having value altered)
     def slave_moved(self, slider):
         val = slider.value()
         if val > 0.8:
@@ -94,7 +92,7 @@ class VerticalSliderScreen(Screen):
         self.lbl_result.value(to_string(val))
 
 # COROUTINE
-    async def thread1(self):
+    async def coro(self):
         angle = 0
         while True:
             await asyncio.sleep_ms(100)
