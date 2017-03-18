@@ -963,4 +963,4 @@ Optional args:
  * ``bold_v`` Controls the number of pixels to overdraw each character pixel in
  the vertical direction making a bold effect. Value 0 to 3 (default 0).
 
-######[Jump to Contents](./README.md#contents)
+[Jump to Contents](./README.md#contents)
