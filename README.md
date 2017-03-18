@@ -48,6 +48,74 @@ A modal dialog box.
 ![Image](images/IMG_2514.JPG) ![Image](images/IMG_2515.JPG)  
 The Plot module: Cartesian and polar graphs.
 
+# Contents
+
+1. [Pre requisites](./README.md#1-pre-requisites)
+
+  1.1 [Pre installation](./README.md#11-pre-installation)
+
+  1.2 [Library Documentation](./README.md#12-library-documentation)
+
+  1.3 [Python files](./README.md#13-python-files)
+
+2. [Concepts](./README.md#2-concepts)
+
+  2.1 [Terminology](./README.md#21-terminology)
+
+  2.2 [Coordinates](./README.md#22-coordinates)
+
+  2.3 [Colors](./README.md#23-colors)
+
+  2.4 [Callbacks](./README.md#24-callbacks)
+
+  2.5 [Screens](./README.md#25-screens)
+
+3. [Program Structure](./README.md#3-program-structure)
+
+  3.1 [Initialisation](./README.md#31-initialisation)
+
+4. [Class Screen](./README.md#4-class-screen)
+
+5. [Display Classes](./README.md#5-display-classes)
+
+  5.1 [Class Label](./README.md#51-class-label)
+
+  5.2 [Class Dial](./README.md#52-class-dial)
+
+  5.3 [Class LED](./README.md#53-class-led)
+
+  5.4 [Class Meter](./README.md#54-class-meter)
+
+6. [Control Classes](./README.md#6-control-classes)
+
+  6.1 [Class Slider](./README.md#61-class-slider)
+
+  6.2 [Class Knob](./README.md#62-class-knob)
+
+  6.3 [Class Checkbox](./README.md#63-class-checkbox)
+
+  6.4 [Class Button](./README.md#64-class-button)
+
+  6.5 [Class ButtonList: emulate a button with multiple states](./README.md#85-class-buttonlist-emulate-a-button-with-multiple-states)
+
+  6.6 [Class RadioButtons](./README.md#66-class-radiobuttons)
+
+  6.7 [Class Listbox](./README.md#67-class-listbox)
+
+  6.8 [Class Dropdown](./README.md#68-class-dropdown)
+
+7. [Dialog Boxes](./README.md#7-dialog-boxes)
+
+  7.1 [Class Aperture](./README.md#71-class-aperture)
+
+  7.2 [Class DialogBox](./README.md#72-class-dialogbox)
+
+8. [Fonts](./README.md#8-fonts)
+
+  8.1 [External fonts](./README.md#81-external-fonts)
+
+  8.2 [Internal fonts: Class IFont](./README.md#82-internal-fonts-class-ifont)
+
 # 1. Pre requisites
 
 ## 1.1 Pre installation
@@ -120,6 +188,8 @@ bytecode.
 It is also wise to issue ctrl-D to soft reset the Pyboard before importing a
 module which uses the library. The test programs require a ctrl-D before import.
 
+######[Jump to Contents](./README.md#contents)
+
 # 2. Concepts
 
 ## 2.1 Terminology
@@ -182,6 +252,8 @@ box.
 
 The ``Screen`` class is configured in ``lcd_local.py``.
 
+######[Jump to Contents](./README.md#contents)
+
 # 3. Program Structure
 
 The following illustrates the structure of a minimal program:
@@ -217,6 +289,8 @@ the documentation for the latter may be viewed
 [here](http://docs.micropython.org/en/latest/pyboard/library/lcd160cr.html#lcd160cr.LCD160CR.set_spi_win).
 An additional optional constructor keyword argument ``bufsize`` is available.
 See section 8 (Fonts) for its use.
+
+######[Jump to Contents](./README.md#contents)
 
 # 4. Class Screen
 
@@ -307,6 +381,8 @@ These do nothing, and may be defined in subclasses if required.
  * ``after_open`` Called after a screen has been displayed.
  * ``on_hide`` Called when a screen ceases to be current.
 
+######[Jump to Contents](./README.md#contents)
+
 # 5. Display Classes
 
 These classes provide ways to display data and are not touch sensitive.
@@ -333,6 +409,8 @@ Keyword only arguments:
 Method:
  * ``value`` Argument ``val`` string, default ``None``. If provided, refreshes
  the label with the passed text otherwise clears the text in the label.
+
+######[Jump to Contents](./README.md#contents)
 
 ## 5.2 Class Dial
 
@@ -361,6 +439,8 @@ Method:
  pointer index exceeds the number of pointers defined by the constructor
  ``pointers`` argument.
 
+######[Jump to Contents](./README.md#contents)
+
 ## 5.3 Class LED
 
 Displays a boolean state. Can display other information by varying the color.
@@ -381,6 +461,8 @@ Methods:
  extinguishes the LED. Always returns its current state.
  * ``color`` Argument ``color``. Change the LED color without altering its
  state.
+
+######[Jump to Contents](./README.md#contents)
 
 ## 5.4 Class Meter
 
@@ -409,6 +491,8 @@ Methods:
  * ``value`` Optional argument ``val``. If provided, refreshes the meter
  display with a new value. Range 0.0 to 1.0: out of range values will be
  constrained to full scale or 0. Always returns its current value. 
+
+######[Jump to Contents](./README.md#contents)
 
 
 # 6. Control Classes
@@ -465,6 +549,8 @@ Methods:
  * ``color`` Mandatory arg ``color`` The control is rendered in the selected
  color. This supports dynamic color changes  
 
+######[Jump to Contents](./README.md#contents)
+
 ## 6.2 Class Knob
 
 This emulates a rotary control capable of being rotated through a predefined
@@ -501,6 +587,8 @@ Methods:
  correspond to the new value. The move callback will run. The method constrains
  the range to 0.0 to 1.0. Always returns the control's value.
 
+######[Jump to Contents](./README.md#contents)
+
 ## 6.3 Class Checkbox
 
 This provides for boolean data entry and display. In the ``True`` state the
@@ -530,6 +618,8 @@ Methods:
  * ``value`` Optional boolean argument ``val``. If the provided value does not
  correspond to the control's current value, updates it; the checkbox is
  re-drawn and the callback executed. Always returns the control's value.
+
+######[Jump to Contents](./README.md#contents)
 
 ## 6.4 Class Button
 
@@ -573,7 +663,9 @@ Class variables:
  * ``lit_time`` Period in seconds the ``litcolor`` is displayed. Default 1.
  * ``long_press_time`` Press duration for a long press. Default 1 second.
 
-## 6.5 Class ButtonList: emulate a button with multiple states
+######[Jump to Contents](./README.md#contents)
+
+## 6.5 Class ButtonList emulate a button with multiple states
 
 A ``ButtonList`` groups a number of buttons together to implement a button
 which changes state each time it is pressed. For example it might toggle
@@ -616,6 +708,8 @@ for t in table: # Buttons overlay each other at same location
     bl.add_button((10, 10), font = font14, fontcolor = BLACK, **t)
 ```
 
+######[Jump to Contents](./README.md#contents)
+
 ## 6.6 Class RadioButtons
 
 These comprise a set of buttons at different locations. When a button is
@@ -655,6 +749,8 @@ for t in table:
                     fgcolor = LIGHTBLUE, height = 40, **t)
     x += 60 # Horizontal row of buttons
 ```
+
+######[Jump to Contents](./README.md#contents)
 
 ## 6.7 Class Listbox
 
@@ -696,6 +792,8 @@ Methods:
 The callback is triggered whenever a listbox item is pressed, even if that item
 is already currently selected.
 
+######[Jump to Contents](./README.md#contents)
+
 ## 6.8 Class Dropdown
 
 A dropdown list. The list, when active, is drawn below the control. The height
@@ -736,6 +834,8 @@ Methods:
 The callback is triggered if an item on the dropdown list is touched and that
 item is not currently selected (i.e. when a change occurs).
 
+######[Jump to Contents](./README.md#contents)
+
 # 7. Dialog Boxes
 
 In general ``Screen`` objects occupy the entire physical display. The principal
@@ -755,6 +855,8 @@ A convenience method ``locn`` is provided to assist in populating dialog boxes.
 Given coordinates relative to the dialog box, it provides an absolute
 ``location`` 2-tuple suitable as a constructor argument for ``control`` or
 ``display`` classes. See ``ldb.py`` for example usage.
+
+######[Jump to Contents](./README.md#contents)
 
 ## 7.1 Class Aperture
 
@@ -788,6 +890,8 @@ Class method:
  can query this by implementing an ``on_open`` method which calls
  ``Aperture.value()`` (see ``ldb.py``).
 
+######[Jump to Contents](./README.md#contents)
+
 ## 7.2 Class DialogBox
 
 Eases building a dialog box subset based on a row of pushbuttons. Any button
@@ -814,6 +918,8 @@ Optional keyword only args:
 Pressing any button closes the dialog and sets the ``Aperture`` value to the
 text of the button pressed or 'Close' in the case of the ``close`` button.
 
+######[Jump to Contents](./README.md#contents)
+
 # 8. Fonts
 
 The LCD160CR contains internal fixed pitch fonts. These may be used as an
@@ -838,7 +944,9 @@ default of 1058 bytes provides for external fonts up to 23 by 23 pixels.
 A ``UguiException`` will be raised if an application attempts to use a font too
 large for the buffer.
 
-## 8.2 Internal fonts: Class IFont
+######[Jump to Contents](./README.md#contents)
+
+## 8.2 Internal fonts Class IFont
 
 To use internal fonts an ``IFont`` is instantiated. The instance is then passed
 to GUI constructors in the same way as for external fonts. See test program
@@ -854,3 +962,5 @@ Optional args:
  the horizontal direction making a bold effect. Value 0 to 3 (default 0).
  * ``bold_v`` Controls the number of pixels to overdraw each character pixel in
  the vertical direction making a bold effect. Value 0 to 3 (default 0).
+
+######[Jump to Contents](./README.md#contents)
