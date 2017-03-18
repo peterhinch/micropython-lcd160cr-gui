@@ -96,7 +96,7 @@ The Plot module: Cartesian and polar graphs.
 
   6.4 [Class Button](./README.md#64-class-button)
 
-  6.5 [Class ButtonList: emulate a button with multiple states](./README.md#85-class-buttonlist-emulate-a-button-with-multiple-states)
+  6.5 [Class ButtonList: emulate a button with multiple states](./README.md#65-class-buttonlist-emulate-a-button-with-multiple-states)
 
   6.6 [Class RadioButtons](./README.md#66-class-radiobuttons)
 
@@ -188,7 +188,7 @@ bytecode.
 It is also wise to issue ctrl-D to soft reset the Pyboard before importing a
 module which uses the library. The test programs require a ctrl-D before import.
 
-######[Jump to Contents](./README.md#contents)
+[Jump to Contents](./README.md#contents)
 
 # 2. Concepts
 
