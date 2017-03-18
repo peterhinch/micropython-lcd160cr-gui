@@ -188,7 +188,7 @@ bytecode.
 It is also wise to issue ctrl-D to soft reset the Pyboard before importing a
 module which uses the library. The test programs require a ctrl-D before import.
 
-[Jump to Contents](./README.md#contents)
+######[Jump to Contents](./README.md#contents)
 
 # 2. Concepts
 
