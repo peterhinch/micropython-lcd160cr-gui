@@ -514,6 +514,13 @@ class Screen(object):
             await asyncio.sleep_ms(0)
             touched, x, y = touch_panel.get_touch()
             if touched:
+                # The following fixes a problem with the driver/panel where the first
+                # coordinates read are incorrect. Reading again after a delay seems to fix it
+                await asyncio.sleep_ms(20)
+                touched, xx, yy = touch_panel.get_touch()
+                if touched:  # Still touched: update x and y with the latest values
+                    x = xx
+                    y = yy
                 for obj in Screen.current_screen.touchlist:
                     if obj.visible and not obj.greyed_out():
                         obj._trytouch(x, y)
@@ -1428,7 +1435,7 @@ class Listbox(Touchable):
 
     def _touched(self, x, y):
         dy = y - (self.location[1])
-        self._initial_value = dy // self.entry_height
+        self._initial_value = min(dy // self.entry_height, len(self.elements) -1)
 
     def _untouched(self):
         if self._initial_value is not None:
