@@ -305,15 +305,9 @@ class LCD160CR_G(LCD160CR):
 
     # Save and restore a rect region to a 16 bit array.
     # Regions are inclusive of start and end (to match fill_rectangle)
-    # Takes ~21ms for vert slider ~30ms for horizontal
-    def save_region(self, buf, linebuf, x0, y0, x1, y1):
-        obuf = memoryview(buf)
-        offset = 0
-        ll = len(linebuf) - 1
-        for y in range(y0, y1 + 1):
-            self.get_line(x0, y, linebuf)
-            obuf[offset : offset + ll] = linebuf[1:]
-            offset += ll
+
+    def save_region(self, buf, x0, y0, x1, y1):
+        self.screen_dump(buf, x0, y0, x1 - x0 + 1, y1 - y0 + 1)
 
     # 1.1ms
     def restore_region(self, buf, x0, y0, x1, y1):
@@ -836,7 +830,6 @@ class Meter(NoTouch):
         NoTouch.__init__(self, location, font, height, width, fgcolor, bgcolor, fontcolor, border, value, None) # super() provoked Python bug
         border = self.border # border width
         self.savebuf = bytearray((self.width + 1) * 2)  # 2 bytes per pixel
-        self.linebuf = bytearray((self.width + 1) * 2 + 1)
         self.x0 = self.location[0]
         self.x1 = self.location[0] + self.width
         self.y0 = self.location[1] + border + 2
@@ -876,7 +869,7 @@ class Meter(NoTouch):
         if self.ptr_y is not None: # Restore background if it was saved
             tft.restore_region(self.savebuf, x0, self.ptr_y, x1, self.ptr_y)
         self.ptr_y = int(self.y1 - self._value * height) # y position of slider
-        tft.save_region(self.savebuf, self.linebuf, x0, self.ptr_y, x1, self.ptr_y) # Read background
+        tft.save_region(self.savebuf, x0, self.ptr_y, x1, self.ptr_y) # Read background
         tft.draw_hline(x0, self.ptr_y, width, self.pointercolor) # Draw pointer
 
 
@@ -1117,7 +1110,7 @@ class Checkbox(Touchable):
 # A slider's text items lie outside its bounding box (area sensitive to touch)
 
 # Buffer sizes: saved region is inclusive of pixels at x + width and y + height hence +1
-# Saved data is 2 bytes per pixel. linebuf  is + 1 byte due to behaviour of get_line()
+# Saved data is 2 bytes per pixel.
 class Slider(Touchable):
     def __init__(self, location, *, font=None, height=120, width=20, divisions=10, legends=None,
                  fgcolor=None, bgcolor=None, fontcolor=None, slidecolor=None, border=None, 
@@ -1132,7 +1125,6 @@ class Slider(Touchable):
         self.slideheight = 6 # must be divisible by 2
                              # We draw an odd number of pixels:
         self.savebuf = bytearray((self.slideheight + 1) * (slidewidth + 1) * 2)  # 2 bytes per pixel
-        self.linebuf = bytearray((slidewidth + 1) * 2 + 1)
         b = self.border
         self.pot_dimension = self.height - 2 * (b + self.slideheight // 2)
         width = self.width - 2 * b
@@ -1191,7 +1183,7 @@ class Slider(Touchable):
 
     def save_background(self, tft): # Read background under slide
         if self.slide_y is not None:
-            tft.save_region(self.savebuf, self.linebuf, *self.slide_coords())
+            tft.save_region(self.savebuf, *self.slide_coords())
 
     def render_bg(self, tft):
         if self.slide_y is not None:
@@ -1224,7 +1216,6 @@ class HorizSlider(Touchable):
         self.slidewidth = 6 # must be divisible by 2
                              # We draw an odd number of pixels
         self.savebuf = bytearray((slideheight + 1) * (self.slidewidth + 1) * 2)  # 2 bytes per pixel
-        self.linebuf = bytearray((self.slidewidth + 1) * 2 + 1)
         b = self.border
         self.pot_dimension = self.width - 2 * (b + self.slidewidth // 2)
         height = self.height - 2 * b
@@ -1284,7 +1275,7 @@ class HorizSlider(Touchable):
 
     def save_background(self, tft): # Read background under slide
         if self.slide_x is not None:
-            tft.save_region(self.savebuf, self.linebuf, *self.slide_coords())
+            tft.save_region(self.savebuf, *self.slide_coords())
 
     def render_bg(self, tft):
         if self.slide_x is not None:
