@@ -97,7 +97,7 @@ The Cartesian curve constructor takes the following positional arguments:
 Mandatory argument:
  1. ``graph`` The ``CartesianGraph`` instance.
 
-Optional arguments:
+Optional arguments:  
  2. ``populate`` A callback function to populate the curve. See below. Default: a null function.  
  3. ``args`` List or tuple of arguments for ``populate`` callback. Default [].  
  4. ``origin`` 2-tuple containing x and y values for the origin. Default (0, 0).  
@@ -131,7 +131,7 @@ The constructor takes the following positional arguments:
 Mandatory argument:
  1. ``graph`` The ``CartesianGraph`` instance.
 
-Optional arguments:
+Optional arguments:  
  2. ``populate`` A callback function to populate the curve. See below. Default: a null function.  
  3. ``args`` List or tuple of arguments for ``populate`` callback. Default [].  
  4. ``color`` Default YELLOW.
