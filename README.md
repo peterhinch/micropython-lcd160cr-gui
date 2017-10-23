@@ -188,7 +188,7 @@ bytecode.
 It is also wise to issue ctrl-D to soft reset the Pyboard before importing a
 module which uses the library. The test programs require a ctrl-D before import.
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 # 2. Concepts
 
@@ -252,7 +252,7 @@ box.
 
 The ``Screen`` class is configured in ``lcd_local.py``.
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 # 3. Program Structure
 
@@ -290,7 +290,7 @@ the documentation for the latter may be viewed
 An additional optional constructor keyword argument ``bufsize`` is available.
 See section 8 (Fonts) for its use.
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 # 4. Class Screen
 
@@ -381,7 +381,7 @@ These do nothing, and may be defined in subclasses if required.
  * ``after_open`` Called after a screen has been displayed.
  * ``on_hide`` Called when a screen ceases to be current.
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 # 5. Display Classes
 
@@ -410,7 +410,7 @@ Method:
  * ``value`` Argument ``val`` string, default ``None``. If provided, refreshes
  the label with the passed text otherwise clears the text in the label.
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 ## 5.2 Class Dial
 
@@ -439,7 +439,7 @@ Method:
  pointer index exceeds the number of pointers defined by the constructor
  ``pointers`` argument.
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 ## 5.3 Class LED
 
@@ -462,7 +462,7 @@ Methods:
  * ``color`` Argument ``color``. Change the LED color without altering its
  state.
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 ## 5.4 Class Meter
 
@@ -492,7 +492,7 @@ Methods:
  display with a new value. Range 0.0 to 1.0: out of range values will be
  constrained to full scale or 0. Always returns its current value. 
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 
 # 6. Control Classes
@@ -549,7 +549,7 @@ Methods:
  * ``color`` Mandatory arg ``color`` The control is rendered in the selected
  color. This supports dynamic color changes  
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 ## 6.2 Class Knob
 
@@ -587,7 +587,7 @@ Methods:
  correspond to the new value. The move callback will run. The method constrains
  the range to 0.0 to 1.0. Always returns the control's value.
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 ## 6.3 Class Checkbox
 
@@ -619,7 +619,7 @@ Methods:
  correspond to the control's current value, updates it; the checkbox is
  re-drawn and the callback executed. Always returns the control's value.
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 ## 6.4 Class Button
 
@@ -663,7 +663,7 @@ Class variables:
  * ``lit_time`` Period in seconds the ``litcolor`` is displayed. Default 1.
  * ``long_press_time`` Press duration for a long press. Default 1 second.
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 ## 6.5 Class ButtonList emulate a button with multiple states
 
@@ -708,7 +708,7 @@ for t in table: # Buttons overlay each other at same location
     bl.add_button((10, 10), font = font14, fontcolor = BLACK, **t)
 ```
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 ## 6.6 Class RadioButtons
 
@@ -750,7 +750,7 @@ for t in table:
     x += 60 # Horizontal row of buttons
 ```
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 ## 6.7 Class Listbox
 
@@ -792,7 +792,7 @@ Methods:
 The callback is triggered whenever a listbox item is pressed, even if that item
 is already currently selected.
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 ## 6.8 Class Dropdown
 
@@ -834,7 +834,7 @@ Methods:
 The callback is triggered if an item on the dropdown list is touched and that
 item is not currently selected (i.e. when a change occurs).
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 # 7. Dialog Boxes
 
@@ -856,7 +856,7 @@ Given coordinates relative to the dialog box, it provides an absolute
 ``location`` 2-tuple suitable as a constructor argument for ``control`` or
 ``display`` classes. See ``ldb.py`` for example usage.
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 ## 7.1 Class Aperture
 
@@ -890,7 +890,7 @@ Class method:
  can query this by implementing an ``on_open`` method which calls
  ``Aperture.value()`` (see ``ldb.py``).
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 ## 7.2 Class DialogBox
 
@@ -918,7 +918,7 @@ Optional keyword only args:
 Pressing any button closes the dialog and sets the ``Aperture`` value to the
 text of the button pressed or 'Close' in the case of the ``close`` button.
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 # 8. Fonts
 
@@ -944,7 +944,7 @@ default of 1058 bytes provides for external fonts up to 23 by 23 pixels.
 A ``UguiException`` will be raised if an application attempts to use a font too
 large for the buffer.
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 ## 8.2 Internal fonts Class IFont
 
@@ -963,4 +963,4 @@ Optional args:
  * ``bold_v`` Controls the number of pixels to overdraw each character pixel in
  the vertical direction making a bold effect. Value 0 to 3 (default 0).
 
-######[Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)

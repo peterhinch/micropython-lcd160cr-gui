@@ -98,10 +98,10 @@ Mandatory argument:
  1. ``graph`` The ``CartesianGraph`` instance.
 
 Optional arguments:
- 2. ``populate`` A callback function to populate the curve. See below. Default: a null function.
- 3. ``args`` List or tuple of arguments for ``populate`` callback. Default [].
- 4. ``origin`` 2-tuple containing x and y values for the origin. Default (0, 0).
- 5. ``excursion`` 2-tuple containing scaling values for x and y. Default (1, 1).
+ 2. ``populate`` A callback function to populate the curve. See below. Default: a null function.  
+ 3. ``args`` List or tuple of arguments for ``populate`` callback. Default [].  
+ 4. ``origin`` 2-tuple containing x and y values for the origin. Default (0, 0).  
+ 5. ``excursion`` 2-tuple containing scaling values for x and y. Default (1, 1).  
  6. ``color`` Default YELLOW.
 
 Methods:
@@ -132,8 +132,8 @@ Mandatory argument:
  1. ``graph`` The ``CartesianGraph`` instance.
 
 Optional arguments:
- 2. ``populate`` A callback function to populate the curve. See below. Default: a null function.
- 3. ``args`` List or tuple of arguments for ``populate`` callback. Default [].
+ 2. ``populate`` A callback function to populate the curve. See below. Default: a null function.  
+ 3. ``args`` List or tuple of arguments for ``populate`` callback. Default [].  
  4. ``color`` Default YELLOW.
 
 Methods:
