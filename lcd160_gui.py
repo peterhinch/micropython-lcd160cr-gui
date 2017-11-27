@@ -1132,6 +1132,8 @@ class Slider(Touchable):
         self.slide_x0 = xcentre - slidewidth // 2
         self.slide_x1 = xcentre + slidewidth // 2 # slide X coordinates
         self.slide_y = None # Invalidate slide position
+        # Prevent Label objects being added to display list when already there.
+        self.drawn = False
 
     def show(self):
         tft = self.tft
@@ -1152,7 +1154,8 @@ class Slider(Touchable):
                     tft.draw_hline(x + 1, ypos, dx, self.fgcolor)
                     tft.draw_hline(x + 2 + width // 2, ypos, dx, self.fgcolor) # Add half slot width
 
-            if self.legends is not None: # Legends
+            # Legends: if redrawing, they are already on the Screen's display list
+            if self.legends is not None and not self.drawn:
                 if len(self.legends) <= 1:
                     dy = 0
                 else:
@@ -1172,6 +1175,7 @@ class Slider(Touchable):
         self.save_background(tft)
         color = self.slidecolor if self.slidecolor is not None else self.fgcolor
         self.render_slide(tft, color)
+        self.drawn = True
 
     def update(self, tft):
         y = self.location[1] + self.border + self.slideheight // 2
@@ -1223,6 +1227,8 @@ class HorizSlider(Touchable):
         self.slide_y0 = ycentre - slideheight // 2
         self.slide_y1 = ycentre + slideheight // 2 # slide Y coordinates
         self.slide_x = None # invalidate: slide has not yet been drawn
+        # Prevent Label objects being added to display list when already there.
+        self.drawn = False
 
     def show(self):
         tft = self.tft
@@ -1243,7 +1249,8 @@ class HorizSlider(Touchable):
                     tft.draw_vline(xpos, y + 1, dy, self.fgcolor)
                     tft.draw_vline(xpos, y + 2 + height // 2,  dy, self.fgcolor) # Add half slot width
 
-            if self.legends is not None: # Legends
+            # Legends: if redrawing, they are already on the Screen's display list
+            if self.legends is not None and not self.drawn:
                 if len(self.legends) <= 1:
                     dx = 0
                 else:
@@ -1264,6 +1271,7 @@ class HorizSlider(Touchable):
         self.save_background(tft)
         color = self.slidecolor if self.slidecolor is not None else self.fgcolor
         self.render_slide(tft, color)
+        self.drawn = True
 
     def update(self, tft):
         x = self.location[0] + self.border + self.slidewidth // 2
