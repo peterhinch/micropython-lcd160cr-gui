@@ -1,8 +1,9 @@
-# pt.py Test/demo of graph plotting extension for Pybboard TFT GUI
+# lpt.py Test/demo of graph plotting extension for Pybboard TFT GUI
+# Now tests clipping of overrange data.
 
 # The MIT License (MIT)
 #
-# Copyright (c) 2016 Peter Hinch
+# Copyright (c) 2017 Peter Hinch
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +29,7 @@ from lcd160_gui import Button, Label, Screen
 from constants import *
 from lcd_local import setup
 import font10
-from math import sin, pi
+from math import sin, cos, pi
 from cmath import rect
 
 # STANDARD BUTTONS
@@ -86,6 +87,8 @@ class BaseScreen(Screen):
         fwdbutton(0, 51, PolarScreen, 'Polar')
         fwdbutton(0, 79, XYScreen, 'XY')
         fwdbutton(0, 107, RealtimeScreen, 'RT')
+        fwdbutton(60, 51, PolarORScreen, 'Over')
+        fwdbutton(60, 79, DiscontScreen, 'Lines')
         quitbutton()
 
 class PolarScreen(Screen):
@@ -101,6 +104,26 @@ class PolarScreen(Screen):
     def populate(self, curve):
         def f(theta):
             return rect(sin(3 * theta), theta) # complex
+        nmax = 150
+        for n in range(nmax + 1):
+            theta = 2 * pi * n / nmax
+            curve.point(f(theta))
+
+# Test clipping
+class PolarORScreen(Screen):
+    def __init__(self):
+        super().__init__()
+        backbutton()
+        ovlbutton()
+        g = PolarGraph((5, 5), border = 4, height=110)
+        clearbutton(g)
+        curve = PolarCurve(g, self.populate, (1,))
+        curve1 = PolarCurve(g, self.populate, (rect(1, pi/5),), color=RED)
+        refreshbutton((curve, curve1))
+
+    def populate(self, curve, rot):
+        def f(theta):
+            return rect(1.15*sin(5 * theta), theta)*rot # complex
         nmax = 150
         for n in range(nmax + 1):
             theta = 2 * pi * n / nmax
@@ -130,6 +153,32 @@ class XYScreen(Screen):
             y = x**2
             curve.point(x, y)
             x += 0.1
+
+# Test of discontinuous curves and those which provoke clipping
+class DiscontScreen(Screen):
+    def __init__(self):
+        super().__init__()
+        backbutton()
+        ovlbutton()
+        g = CartesianGraph((5, 5), height = 115, width = 115)
+        clearbutton(g)
+        curve1 = Curve(g, self.populate_1, (1.1,))
+        curve2 = Curve(g, self.populate_1, (1.05,), color=RED)
+        curve3 = Curve(g, self.populate_3, color=BLUE)
+        refreshbutton((curve1, curve2, curve3))
+
+    def populate_3(self, curve):
+        for x, y in ((-2, -0.2), (-2, 0.2), (-0.2, -2), (0.2, -2), (2, 0.2), (2, -0.2), (0.2, 2), (-0.2, 2)):
+            curve.point(x, y)
+            curve.point(0,0)
+            curve.point()
+
+    def populate_1(self, curve, mag):
+        theta = 0
+        delta = pi/32
+        while theta <= 2 * pi:
+            curve.point(mag*sin(theta), mag*cos(theta))
+            theta += delta
 
 # Simulate slow real time data acquisition and plotting
 class RealtimeScreen(Screen):
