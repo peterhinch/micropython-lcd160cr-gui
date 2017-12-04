@@ -136,9 +136,10 @@ class PolarCurve(Curve): # Points are complex
 
         res = self._clip(*(self.lastpoint + self.newpoint))  # Clip to +-1 box
         if res is not None:  # At least part of line was in box
-            start = self.lastpoint[0] + self.lastpoint[1]*1j
-            end = self.newpoint[0] + self.newpoint[1]*1j
-            self.graph.line(start, end, self.color)
+            self.graph.rline(res, self.color)
+            #start = self.lastpoint[0] + self.lastpoint[1]*1j
+            #end = self.newpoint[0] + self.newpoint[1]*1j
+            #self.graph.line(start, end, self.color)
         self.lastpoint = self.newpoint  # Scaled but not clipped
 
 
@@ -201,12 +202,11 @@ class CartesianGraph(NoTouch, Graph):
             curve.show()
 
     def line(self, start, end, color): # start and end relative to origin and scaled -1 .. 0 .. +1
-        tft = self.tft
         xs = int(self.xp_origin + start[0] * self.x_axis_len)
         ys = int(self.yp_origin - start[1] * self.y_axis_len)
         xe = int(self.xp_origin + end[0] * self.x_axis_len)
         ye = int(self.yp_origin - end[1] * self.y_axis_len)
-        tft.draw_line(xs, ys, xe, ye, color)
+        self.tft.draw_line(xs, ys, xe, ye, color)
 
 class PolarGraph(NoTouch, Graph):
     def __init__(self, location, *, height=100, fgcolor=WHITE, bgcolor=None, border=None,
@@ -233,17 +233,24 @@ class PolarGraph(NoTouch, Graph):
             v = complex(1)
             m = rect(1, pi / self.adivs)
             for _ in range(self.adivs):
-                self.line(-v, v, self.gridcolor)
+                self.cline(-v, v, self.gridcolor)
                 v *= m
         tft.draw_vline(x0 + radius, y0, diam, self.fgcolor)
         tft.draw_hline(x0, y0 + radius, diam, self.fgcolor)
         for curve in self.curves:
             curve.show()
 
-    def line(self, start, end, color): # start and end are complex, 0 <= magnitude <= 1
-        tft = self.tft
+    def cline(self, start, end, color): # start and end are complex, 0 <= magnitude <= 1
         xs = int(self.xp_origin + start.real * self.radius)
         ys = int(self.yp_origin - start.imag * self.radius)
         xe = int(self.xp_origin + end.real * self.radius)
         ye = int(self.yp_origin - end.imag * self.radius)
-        tft.draw_line(xs, ys, xe, ye, color)
+        self.tft.draw_line(xs, ys, xe, ye, color)
+
+    def rline(self, vect, color): # start and end relative to origin and scaled -1 .. 0 .. +1
+        height = self.radius  # Unit: pixels
+        xs = int(self.xp_origin + vect[0] * height)
+        ys = int(self.yp_origin - vect[1] * height)
+        xe = int(self.xp_origin + vect[2] * height)
+        ye = int(self.yp_origin - vect[3] * height)
+        self.tft.draw_line(xs, ys, xe, ye, color)
