@@ -26,34 +26,27 @@ from lcd160_gui import NoTouch, dolittle, Screen
 from constants import *
 from math import pi
 from cmath import rect
+from micropython import const
+
+# Line clipping outcode bits
+_TOP = const(1)
+_BOTTOM = const(2)
+_LEFT = const(4)
+_RIGHT = const(8)
+# Bounding box for line clipping
+_XMAX = const(1)
+_XMIN = const(-1)
+_YMAX = const(1)
+_YMIN = const(-1)
 
 
 class Curve(object):
     @staticmethod
-    def _clp(badpoint, point):  # 1st point is bad, 2nd is don't know
-        xn, yn = point
-        xs, ys = badpoint
-        if ys > 1:
-            xs = xn + (1 - yn)*(xs - xn)/(ys - yn)
-            ys = 1
-        if ys < -1:
-            xs = xn + (1 + yn)*(xs - xn)/(yn - ys)
-            ys = -1
-        if xs > 1:
-            ys = yn + (1 - xn)*(ys - yn)/(xs - xn)
-            xs = 1
-        if xs < -1:
-            ys = yn + (1 + xn)*(ys - yn)/(xn - xs)
-            xs = -1
-        return xs, ys
-
-    @staticmethod
-    def _outcode(point):
-        x, y = point
-        oc = 1 if y > 1 else 0
-        oc |= 2 if y < -1 else 0
-        oc |= 4 if x > 1 else 0
-        oc |= 8 if x < -1 else 0
+    def _outcode(x, y):
+        oc = _TOP if y > 1 else 0
+        oc |= _BOTTOM if y < -1 else 0
+        oc |= _RIGHT if x > 1 else 0
+        oc |= _LEFT if x < -1 else 0
         return oc
 
     def __init__(self, graph, populate=dolittle, args=[], origin=(0, 0), excursion=(1, 1), color=YELLOW):
@@ -73,32 +66,46 @@ class Curve(object):
             self.lastpoint = None
             return
 
-        np = self._scale(x, y)  # In-range points scaled to +-1 bounding box
-        self.newpoint = np
+        self.newpoint = self._scale(x, y)  # In-range points scaled to +-1 bounding box
         if self.lastpoint is None:  # Nothing to plot. Save for next line.
-            # Can leave lastpoint outside bounding box.
             self.lastpoint = self.newpoint
             return
 
-        self._clip()  # Clip to +-1 box
-        if self.newpoint is not None:  # At least part of line was in box
-            self.graph.line(self.lastpoint, self.newpoint, self.color)
-        self.lastpoint = np  # Scaled but not clipped
+        res = self._clip(*(self.lastpoint + self.newpoint))  # Clip to +-1 box
+        if res is not None:  # Ignore lines which don't intersect
+            self.graph.line(res[0:2], res[2:5], self.color)
+        self.lastpoint = self.newpoint  # Scaled but not clipped
 
+    # Cohen–Sutherland line clipping algorithm
     # If self.newpoint and self.lastpoint are valid clip them so that both lie
     # in +-1 range. If both are outside the box return None.
-    def _clip(self):
-        oc1 = self._outcode(self.newpoint)
-        oc2 = self._outcode(self.lastpoint)
-        if oc1 == 0 and oc2 == 0:  # OK to plot
-            return
-        if oc1 & oc2:  # Nothing to do
-            self.newpoint = None
-            return
-        if oc1:
-            self.newpoint = self._clp(self.newpoint, self.lastpoint)
-        if oc2:
-            self.lastpoint = self._clp(self.lastpoint, self.newpoint)
+    def _clip(self, x0, y0, x1, y1):
+        oc1 = self._outcode(x0, y0)
+        oc2 = self._outcode(x1, y1)
+        while True:
+            if not oc1 | oc2:  # OK to plot
+                return x0, y0, x1, y1
+            if oc1 & oc2:  # Nothing to do
+                return
+            oc = oc1 if oc1 else oc2
+            if oc & _TOP:
+                x = x0 + (_YMAX - y0)*(x1 - x0)/(y1 - y0)
+                y = _YMAX
+            elif oc & _BOTTOM:
+                x = x0 + (_YMIN - y0)*(x1 - x0)/(y1 - y0)
+                y = _YMIN
+            elif oc & _RIGHT:
+                y = y0 + (_XMAX - x0)*(y1 - y0)/(x1 - x0)
+                x = _XMAX
+            elif oc & _LEFT:
+                y = y0 + (_XMIN - x0)*(y1 - y0)/(x1 - x0)
+                x = _XMIN
+            if oc is oc1:
+                x0, y0 = x, y
+                oc1 = self._outcode(x0, y0)
+            else:
+                x1, y1 = x, y
+                oc2 = self._outcode(x1, y1)
 
     def show(self):
         self.graph.addcurve(self) # May have been removed by clear()
@@ -122,19 +129,17 @@ class PolarCurve(Curve): # Points are complex
             self.lastpoint = None
             return
 
-        np = self._scale(z.real, z.imag)  # In-range points scaled to +-1 bounding box
-        self.newpoint = np
+        self.newpoint = self._scale(z.real, z.imag)  # In-range points scaled to +-1 bounding box
         if self.lastpoint is None:  # Nothing to plot. Save for next line.
-            # Can leave lastpoint outside bounding box.
             self.lastpoint = self.newpoint
             return
 
-        self._clip()  # Clip to +-1 box
-        if self.newpoint is not None:  # At least part of line was in box
+        res = self._clip(*(self.lastpoint + self.newpoint))  # Clip to +-1 box
+        if res is not None:  # At least part of line was in box
             start = self.lastpoint[0] + self.lastpoint[1]*1j
             end = self.newpoint[0] + self.newpoint[1]*1j
             self.graph.line(start, end, self.color)
-        self.lastpoint = np  # Scaled but not clipped
+        self.lastpoint = self.newpoint  # Scaled but not clipped
 
 
 class Graph(object):
