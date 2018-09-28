@@ -40,7 +40,7 @@ _YMAX = const(1)
 _YMIN = const(-1)
 
 
-class Curve(object):
+class Curve():
     @staticmethod
     def _outcode(x, y):
         oc = _TOP if y > 1 else 0
@@ -50,6 +50,9 @@ class Curve(object):
         return oc
 
     def __init__(self, graph, populate=dolittle, args=[], origin=(0, 0), excursion=(1, 1), color=YELLOW):
+        if not isinstance(self, PolarCurve):  # Check not done in subclass
+            if isinstance(graph, PolarGraph) or not isinstance(graph, CartesianGraph):
+                raise ValueError('Curve must use a CartesianGraph instance.')
         self.graph = graph
         self.populate = populate
         self.callback_args = args
@@ -121,6 +124,8 @@ class Curve(object):
 
 class PolarCurve(Curve): # Points are complex
     def __init__(self, graph, populate=dolittle, args=[], color=YELLOW):
+        if not isinstance(graph, PolarGraph):
+            raise ValueError('PolarCurve must use a PolarGraph instance.')
         super().__init__(graph, populate, args, color=color)
 
     def point(self, z=None):
@@ -136,14 +141,16 @@ class PolarCurve(Curve): # Points are complex
 
         res = self._clip(*(self.lastpoint + self.newpoint))  # Clip to +-1 box
         if res is not None:  # At least part of line was in box
-            self.graph.rline(res, self.color)
+            start = res[0] + 1j*res[1]
+            end = res[2] + 1j*res[3]
+            self.graph.cline(start, end, self.color)
             #start = self.lastpoint[0] + self.lastpoint[1]*1j
             #end = self.newpoint[0] + self.newpoint[1]*1j
             #self.graph.line(start, end, self.color)
         self.lastpoint = self.newpoint  # Scaled but not clipped
 
 
-class Graph(object):
+class Graph():
     def __init__(self, location, height, width, gridcolor):
         border = self.border # border width
         self.x0 = self.location[0] + border
@@ -245,12 +252,4 @@ class PolarGraph(NoTouch, Graph):
         ys = int(self.yp_origin - start.imag * self.radius)
         xe = int(self.xp_origin + end.real * self.radius)
         ye = int(self.yp_origin - end.imag * self.radius)
-        self.tft.draw_line(xs, ys, xe, ye, color)
-
-    def rline(self, vect, color): # start and end relative to origin and scaled -1 .. 0 .. +1
-        height = self.radius  # Unit: pixels
-        xs = int(self.xp_origin + vect[0] * height)
-        ys = int(self.yp_origin - vect[1] * height)
-        xe = int(self.xp_origin + vect[2] * height)
-        ye = int(self.yp_origin - vect[3] * height)
         self.tft.draw_line(xs, ys, xe, ye, color)
