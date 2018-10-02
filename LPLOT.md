@@ -19,9 +19,9 @@ placed onscreen alongside a graph.
   3.2 [Class PolarGraph](./LPLOT.md#32-class-polargraph)  
  4. [Curve classes](./LPLOT.mp#4-curve-classes)  
   4.1 [Class Curve](./LPLOT.md#41-class-curve)  
-   4.1.1 [Scaling](./LPLOT.md#411-scaling)  
+    4.1.1 [Scaling](./LPLOT.md#411-scaling)  
   4.2 [Class PolarCurve](./LPLOT.md#42-class-polarcurve)  
-   4.2.1 [Scaling](./LPLOT.md#421-scaling)  
+    4.2.1 [Scaling](./LPLOT.md#421-scaling)  
   4.3 [class TSequence](./LPLOT.md#43-class-tSequence) Plot reatime Y values
   on the time axis.  
 
