@@ -15,13 +15,13 @@ placed onscreen alongside a graph.
   2.2 [Curve classes](./LPLOT.md#22-curve-classes)  
   2.3 [Coordinates](./LPLOT.md#23-coordinates)  
  3. [Graph classes](./LPLOT.md#3-graph-classes) Detailed descriptions.  
-  3.1 [Class CartesianGraph](./LPLOT.md#31-class-cartesiangraph)
-  3.2 [Class PolarGraph](./LPLOT.md#32-class-polargraph)
- 4. [Curve classes](./LPLOT.mp#4-curve-classes)
+  3.1 [Class CartesianGraph](./LPLOT.md#31-class-cartesiangraph)  
+  3.2 [Class PolarGraph](./LPLOT.md#32-class-polargraph)  
+ 4. [Curve classes](./LPLOT.mp#4-curve-classes)  
   4.1 [Class Curve](./LPLOT.md#41-class-curve)  
-   4.1.1 [Scaling](./LPLOT.md#411-scaling)
+   4.1.1 [Scaling](./LPLOT.md#411-scaling)  
   4.2 [Class PolarCurve](./LPLOT.md#42-class-polarcurve)  
-   4.2.1 [Scaling](./LPLOT.md#421-scaling)
+   4.2.1 [Scaling](./LPLOT.md#421-scaling)  
   4.3 [class TSequence](./LPLOT.md#43-class-tSequence) Plot reatime Y values
   on the time axis.  
 
@@ -161,7 +161,7 @@ perform data acquisition:
 ```python
     def __init__(self):
         graph = CartesianGraph((0, 0), height = 127, width = 127)
-        curve = Curve(cartgraph, self.go)
+        curve = Curve(graph, self.go)
 
     def go(self, curve):
         loop = asyncio.get_event_loop()
@@ -169,7 +169,6 @@ perform data acquisition:
 
     async def acquire(self, curve):
         x = -1
-        await asyncio.sleep(0)
         while x < 1.01:
             y = max(1 - x * x, 0)
             curve.point(x, y ** 0.5)  # Plot in realtime
@@ -190,9 +189,9 @@ Mandatory argument:
  1. `graph` The `PolarGraph` instance.
 
 Optional arguments:  
- 2. `populate=None` A callback function to populate the curve. See below. Default: a null function.  
- 3. `args` List or tuple of arguments for `populate` callback. Default [].  
- 4. `color` Default YELLOW.
+ 2. `populate=None` A callback function to populate the curve. See below.  
+ 3. `args=[]` List or tuple of arguments for `populate` callback.  
+ 4. `color=YELLOW`  
 
 Methods:
  * `point` Argument z, default `None`. Normally a `complex`. Adds a point
@@ -237,9 +236,9 @@ are discarded. This is akin to old fashioned pen plotters where the pen was at
 the rightmost edge (corresponding to time now) with old values scrolling to the
 left with the time axis in the conventional direction.
 
-When a point is drawn the graticule is cleared and re-drawn with a momentary
-flicker. Consequently this class is best suited to infrequently sampled data
-such as in meteorological applications.
+When a point is drawn the graticule is cleared and re-drawn; the data scrolls
+left. This resuts in a momentary flicker. So this class is best suited to
+infrequently sampled data such as in meteorological applications.
 
 The user instantiates a graph with the X origin at the right hand side and then
 instantiates one or more `TSequence` objects. As each set of data arrives it is
@@ -294,3 +293,6 @@ class Tseq(Screen):
             await asyncio.sleep_ms(500)
             t += 0.1
 ```
+
+The cancellation logic enables the plot screen to be cleanly terminated by a
+`Button` object. It relies on `asyn.py` from [this repo](https://github.com/peterhinch/micropython-async).
