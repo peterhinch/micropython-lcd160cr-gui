@@ -16,11 +16,6 @@ converted from `ttf` or `otf` formats.
 
 An extension for plotting simple graphs is described [here](./LPLOT.md).
 
-**Caveat** The official driver `lcd160cr.py` should be dated 21st Feb 2017
-or later: use firmware dated on or after 22nd Feb 2017 or build from source.
-Issue #2879 is due to be resolved with a display firmware update; in the
-meantime the detection of long button presses is unreliable.
-
 Images from the supplied test programs:
 
 ![Image](images/IMG_2501.JPG) ![Image](images/IMG_2502.JPG)  
@@ -51,71 +46,40 @@ The Plot module: Cartesian and polar graphs.
 
 # Contents
 
-1. [Pre requisites](./README.md#1-pre-requisites)
-
-  1.1 [Pre installation](./README.md#11-pre-installation)
-
-  1.2 [Library Documentation](./README.md#12-library-documentation)
-
-  1.3 [Python files](./README.md#13-python-files)
-
-2. [Concepts](./README.md#2-concepts)
-
-  2.1 [Terminology](./README.md#21-terminology)
-
-  2.2 [Coordinates](./README.md#22-coordinates)
-
-  2.3 [Colors](./README.md#23-colors)
-
-  2.4 [Callbacks](./README.md#24-callbacks)
-
-  2.5 [Screens](./README.md#25-screens)
-
-3. [Program Structure](./README.md#3-program-structure)
-
-  3.1 [Initialisation](./README.md#31-initialisation)
-
-4. [Class Screen](./README.md#4-class-screen)
-
-5. [Display Classes](./README.md#5-display-classes)
-
-  5.1 [Class Label](./README.md#51-class-label)
-
-  5.2 [Class Dial](./README.md#52-class-dial)
-
-  5.3 [Class LED](./README.md#53-class-led)
-
-  5.4 [Class Meter](./README.md#54-class-meter)
-
-6. [Control Classes](./README.md#6-control-classes)
-
-  6.1 [Class Slider](./README.md#61-class-slider)
-
-  6.2 [Class Knob](./README.md#62-class-knob)
-
-  6.3 [Class Checkbox](./README.md#63-class-checkbox)
-
-  6.4 [Class Button](./README.md#64-class-button)
-
-  6.5 [Class ButtonList: emulate a button with multiple states](./README.md#65-class-buttonlist-emulate-a-button-with-multiple-states)
-
-  6.6 [Class RadioButtons](./README.md#66-class-radiobuttons)
-
-  6.7 [Class Listbox](./README.md#67-class-listbox)
-
-  6.8 [Class Dropdown](./README.md#68-class-dropdown)
-
-7. [Dialog Boxes](./README.md#7-dialog-boxes)
-
-  7.1 [Class Aperture](./README.md#71-class-aperture)
-
-  7.2 [Class DialogBox](./README.md#72-class-dialogbox)
-
-8. [Fonts](./README.md#8-fonts)
-
-  8.1 [External fonts](./README.md#81-external-fonts)
-
-  8.2 [Internal fonts: Class IFont](./README.md#82-internal-fonts-class-ifont)
+1. [Pre requisites](./README.md#1-pre-requisites)  
+  1.1 [Pre installation](./README.md#11-pre-installation)  
+  1.2 [Library Documentation](./README.md#12-library-documentation)  
+  1.3 [Python files](./README.md#13-python-files)  
+2. [Concepts](./README.md#2-concepts)  
+  2.1 [Terminology](./README.md#21-terminology)  
+  2.2 [Coordinates](./README.md#22-coordinates)  
+  2.3 [Colors](./README.md#23-colors)  
+  2.4 [Callbacks](./README.md#24-callbacks)  
+  2.5 [Screens](./README.md#25-screens)  
+3. [Program Structure](./README.md#3-program-structure)  
+  3.1 [Initialisation](./README.md#31-initialisation)  
+4. [Class Screen](./README.md#4-class-screen)  
+5. [Display Classes](./README.md#5-display-classes)  
+  5.1 [Class Label](./README.md#51-class-label)  
+  5.2 [Class Dial](./README.md#52-class-dial)  
+  5.3 [Class LED](./README.md#53-class-led)  
+  5.4 [Class Meter](./README.md#54-class-meter)  
+6. [Control Classes](./README.md#6-control-classes)  
+  6.1 [Class Slider](./README.md#61-class-slider)  
+  6.2 [Class Knob](./README.md#62-class-knob)  
+  6.3 [Class Checkbox](./README.md#63-class-checkbox)  
+  6.4 [Class Button](./README.md#64-class-button)  
+  6.5 [Class ButtonList: emulate a button with multiple states](./README.md#65-class-buttonlist-emulate-a-button-with-multiple-states)  
+  6.6 [Class RadioButtons](./README.md#66-class-radiobuttons)  
+  6.7 [Class Listbox](./README.md#67-class-listbox)  
+  6.8 [Class Dropdown](./README.md#68-class-dropdown)  
+7. [Dialog Boxes](./README.md#7-dialog-boxes)  
+  7.1 [Class Aperture](./README.md#71-class-aperture)  
+  7.2 [Class DialogBox](./README.md#72-class-dialogbox)  
+8. [Fonts](./README.md#8-fonts)  
+  8.1 [External fonts](./README.md#81-external-fonts)  
+  8.2 [Internal fonts: Class IFont](./README.md#82-internal-fonts-class-ifont)  
+9. [Issues](./README.md#9-issues) A problem encountered with old firmware  
 
 # 1. Pre requisites
 
@@ -965,3 +929,9 @@ Optional args:
  the vertical direction making a bold effect. Value 0 to 3 (default 0).
 
 ###### [Jump to Contents](./README.md#contents)
+
+# 9. Issues
+
+There was a problem with detection of long button presses (MicroPython issue
+#2879). This was resolved in early 2017 by an upgrade to the LCD160CR firmware.
+If running an old display device you may need to request an upgrade.
