@@ -109,15 +109,6 @@ def print_left(tft, x, y, s, style):
         return font.render(tft, x, y, s, style)
     tft.print_string(s)
 
-def dim(color, factor): # Dim a color
-    if color is not None:
-        return tuple(int(x / factor) for x in color)
-
-def desaturate(color, factor): # Desaturate and dim
-    if color is not None:
-        f = int(max(color) / factor)
-        return (f, f, f)
-
 # *********** LCD160CR_G CLASS ************
 
 
@@ -131,9 +122,8 @@ class LCD160CR_G(LCD160CR):
             bs = 1058  # font14 is 23*23 pixels
         self.glyph_buf = bytearray(bs)
         self._is_grey = False
-        self._desaturate = True
-        self._greyfunc = desaturate
-        self._factor = 2 # Default grey-out methd: dim colors
+        self.dim(2)  # Default grey-out: dim colors by factor of 2
+        self.desaturate(True)
         # Default colors. These never change. They serve as global defaults.
         # bgcolor is also used to blank screen areas.
         self.fgcolor = (WHITE)
@@ -159,7 +149,16 @@ class LCD160CR_G(LCD160CR):
     def desaturate(self, value=None):
         if value is not None:
             self._desaturate = value
-            self._greyfunc = desaturate if value else dim
+            def do_dim(color, factor): # Dim a color
+                if color is not None:
+                    return tuple(int(x / factor) for x in color)
+
+            def do_desat(color, factor): # Desaturate and dim
+                if color is not None:
+                    f = int(max(color) / factor)
+                    return (f, f, f)
+            # Specify the local function
+            self._greyfunc = do_desat if value else do_dim
         return self._desaturate
 
     def dim(self, factor=None):
@@ -168,9 +167,6 @@ class LCD160CR_G(LCD160CR):
                 raise ValueError('Dim factor must be > 1')
             self._factor = factor
         return self._factor
-
-    def skeleton(self): # Determine type of greying
-        return self._factor == 0
 
     def usegrey(self, val): # tft.usegrey(True) sets greyed-out
         self._is_grey = val
@@ -186,18 +182,8 @@ class LCD160CR_G(LCD160CR):
     def fill_rectangle(self, x1, y1, x2, y2, color):
         width = x2 - x1 + 1
         height = y2 - y1 + 1
-        if self._is_grey:
-            if self._factor:
-                self._setcolor(color)
-                self.rect(x1, y1, width, height)
-            else:
-                self._setcolor(self.bgcolor)
-                self.rect(x1, y1, width, height) # Blank space
-                self._setcolor(color)
-                self.rect_outline(x1, y1, width, height)
-        else:
-            self._setcolor(color)
-            self.rect(x1, y1, width, height)
+        self._setcolor(color)
+        self.rect(x1, y1, width, height)
 
     def draw_clipped_rectangle(self, x1, y1, x2, y2, color):
         if x1 > x2:
@@ -274,7 +260,8 @@ class LCD160CR_G(LCD160CR):
             self.dot(x - y1, y - x1)
 
     # pen color has been set by caller
-    def _fill_circle(self, x, y, radius):
+    def fill_circle(self, x, y, radius, color):
+        self._setcolor(color)
         x = int(x)
         y = int(y)
         radius = int(radius)
@@ -288,20 +275,6 @@ class LCD160CR_G(LCD160CR):
                     self.draw_hline(x + x1i, y + y1i, 2 * -x1i)
                     self.draw_hline(x + x1i, y - y1i, 2 * -x1i)
                     break;
-
-    def fill_circle(self, x, y, radius, color):
-        if self._is_grey:
-            if self._factor:
-                self._setcolor(color)
-                self._fill_circle(x, y, radius)
-            else: # greyed out controls drawn as skeleton on screen bgcolor
-                self._setcolor(self.bgcolor)
-                self._fill_circle(x, y, radius)
-                self.draw_circle(x, y, radius, color)
-                self._setcolor(color)
-        else:
-            self._setcolor(color)
-            self._fill_circle(x, y, radius)
 
     # Save and restore a rect region to a 16 bit array.
     # Regions are inclusive of start and end (to match fill_rectangle)
@@ -638,6 +611,7 @@ class NoTouch(object):
 
         self.text_style = tft.text_style((self.fontcolor, self.fontbg, self.font))
         self.border = 0 if border is None else int(max(border, 0)) # width
+        self.bdcolor = self.fgcolor  # Border is always drawn in original fgcolor
         self.callback = dolittle # Value change callback
         self.args = []
         self.cb_end = dolittle # Touch release callbacks
@@ -677,7 +651,7 @@ class NoTouch(object):
             if self.fill:
                 tft.fill_rectangle(x, y, x + self.width, y + self.height, self.bgcolor)
             if self.border > 0: # Draw a bounding box
-                tft.draw_rectangle(x, y, x + self.width, y + self.height, self.fgcolor)
+                tft.draw_rectangle(x, y, x + self.width, y + self.height, self.bdcolor)
         return self.border # border width in pixels
 
     def overlaps(self, xa, ya, xb, yb): # Args must be sorted: xb > xa and yb > ya
@@ -1345,11 +1319,7 @@ class Knob(Touchable):
                 self.value(self._initial_value, show = False)
 
         if self._old_value is not None: # An old pointer needs erasing
-            if self.greyed_out() and tft.skeleton():
-                tft.usegrey(False) # greyed out 'skeleton' style
-                color = tft.get_bgcolor() # erase to screen background
-            else:
-                color = self.bgcolor if self.color is None else self.color # Fill color
+            color = self.bgcolor if self.color is None else self.color # Fill color
             self._drawpointer(self._old_value, color) # erase old
             self.tft # Reset Screen greyed-out status
 
