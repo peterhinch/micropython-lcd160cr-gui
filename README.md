@@ -1,5 +1,6 @@
 # micropython-lcd160gui
 
+V0.12 21st Sep 2020 Updated for (and requires) uasyncio V3.
 V0.11 21st Feb 2017 This doc updated May 2019.
 
 Provides a simple touch driven event based GUI interface for the Pyboard when
@@ -49,7 +50,7 @@ The Plot module: Cartesian and polar graphs.
 1. [Pre requisites](./README.md#1-pre-requisites)  
   1.1 [Pre installation](./README.md#11-pre-installation)  
   1.2 [Library Documentation](./README.md#12-library-documentation)  
-  1.3 [Python files](./README.md#13-python-files)  
+  1.3 [Dependencies and Python files](./README.md#13-dependencies-and-python-files)  
 2. [Concepts](./README.md#2-concepts)  
   2.1 [Terminology](./README.md#21-terminology)  
   2.2 [Coordinates](./README.md#22-coordinates)  
@@ -94,36 +95,38 @@ familiar with building Micropython from source, and installing Python modules
 as persistent bytecode. Instructions on doing this may be found
 [here](http://forum.micropython.org/viewtopic.php?f=6&t=1776).
 
-Familiarity with callbacks and event driven programming will assist in developing
-applications.
+Familiarity with callbacks and event driven programming will assist in
+developing applications. No knowledge of `uasyncio` is required for application
+development as the API is callback-based, but the GUI is compatible with
+`uasyncio` applications.
 
 ## 1.2 Library Documentation
 
 Documentation for the underlying libraries may be found at these sites.  
 
 [lcd160cr driver](http://docs.micropython.org/en/latest/pyboard/library/lcd160cr.html#touch-screen-methods)  
-[Installing the uasyncio library](https://github.com/micropython/micropython-lib) Run
-the Unix build and issue `upip install micropython-uasyncio`. The library can then
-be found at ~/.micropython/lib).
 
 Other references:  
 [Proposed standard font format](https://github.com/peterhinch/micropython-font-to-py)  
 [uasyncio libraries and notes](https://github.com/peterhinch/micropython-async)  
 
-## 1.3 Python files
+## 1.3 Dependencies and Python files
 
-Library directory:
- 1. The uasyncio library may be copied to the Pyboard or flashed as frozen
- bytecode. To do this copy `lib\*` containing the uasyncio installation to
- your frozen modules directory and build.
+Version 3 of uasyncio is included in firmware V1.13 and later. This is a
+requirement.
+
+Clone the repo [uasyncio libraries and notes](https://github.com/peterhinch/micropython-async)
+to your PC and navigate to the V3 directory. Copy the directory `primitives`
+and its contents to the device. If space in the filesystem is limited, only
+these files are required:
+ 1. `__init__.py`
+ 2. `delay_ms.py`
 
 Core files:
- 1. `asyn.py` Synchronisation primitives.
- 2. `aswitch.py` Provides a `Delay_ms` class for retriggerable delays.
- 3. `lcd160_gui.py` The micro GUI library.
- 4. `lcd_local.py` Local hardware definition. This file should be edited to
+ 1. `lcd160_gui.py` The micro GUI library.
+ 2. `lcd_local.py` Local hardware definition. This file should be edited to
  match your hardware. On Pyboard D select the "X" connection.
- 5. `constants.py` Constants such as colors and shapes (import using
+ 3. `constants.py` Constants such as colors and shapes (import using
  `from constants import *`).
 
 Optional files used by test programs:
