@@ -22,12 +22,17 @@
 # THE SOFTWARE.
 
 import framebuf
+try:
+    from framebuf_utils import render
+    fast_mode = True
+except ImportError:
+    fast_mode = False
+from uctypes import bytearray_at, addressof
 import uasyncio as asyncio
 import math
 import gc
 from lcd160cr import LCD160CR
-from aswitch import Delay_ms
-from asyn import Event
+from primitives.delay_ms import Delay_ms
 from constants import *
 TWOPI = 2 * math.pi
 gc.collect()
@@ -46,7 +51,7 @@ class UguiException(Exception):
 def dolittle(*_):
     pass
 
-class IFont(object):
+class IFont:
     size = ((4, 5), (6, 7), (8, 8), (9, 13))  # (w, h) for each font
     def __init__(self, family, scale=0, bold_h=0, bold_v=0):
         self.bold = (bold_h & 3) | ((bold_v & 3) << 2)
@@ -333,15 +338,20 @@ class LCD160CR_G(LCD160CR):
                 self._newline(rows)         # wrap to next text row then print
         if self.text_x + cols >= self.w or self.text_y + rows >= self.h:
             return 0                        # Glyph is not entirely on screen
-        div, mod = divmod(cols, 8)          # Horizontal mapping
-        gbytes = div + 1 if mod else div    # No. of bytes per row of glyph
         fbuf = framebuf.FrameBuffer(self.glyph_buf, cols, rows, framebuf.RGB565)
-        for row in range(rows):
-            for col in range(cols):
-                gbyte, gbit = divmod(col, 8)
-                if gbit == 0:               # Next glyph byte
-                    data = glyph[row * gbytes + gbyte]
-                fbuf.pixel(col, row, fgcolor if data & (1 << (7 - gbit)) else bgcolor)
+        if fast_mode:
+            buf = bytearray_at(addressof(glyph), len(glyph))  # Object with buffer protocol
+            fbc = framebuf.FrameBuffer(buf, cols, rows, framebuf.MONO_HLSB)
+            render(fbuf, fbc, 0, 0, fgcolor, bgcolor)
+        else:
+            div, mod = divmod(cols, 8)          # Horizontal mapping
+            gbytes = div + 1 if mod else div    # No. of bytes per row of glyph
+            for row in range(rows):
+                for col in range(cols):
+                    gbyte, gbit = divmod(col, 8)
+                    if gbit == 0:               # Next glyph byte
+                        data = glyph[row * gbytes + gbyte]
+                    fbuf.pixel(col, row, fgcolor if data & (1 << (7 - gbit)) else bgcolor)
 
         self.set_spi_win(self.text_x, self.text_y, cols, rows)
         self.show_framebuf(fbuf)
@@ -380,10 +390,10 @@ class LCD160CR_G(LCD160CR):
 
 # *********** BASE CLASSES ***********
 
-class Screen(object):
+class Screen:
     current_screen = None
     tft = None
-    is_shutdown = Event()
+    is_shutdown = asyncio.Event()
 
     @classmethod
     def setup(cls, lcd):
@@ -435,12 +445,12 @@ class Screen(object):
         cs_new._do_open(cs_old) # Clear and redraw
         cs_new.after_open() # Optional subclass method
         if init:
-            loop = asyncio.get_event_loop()
-            loop.run_until_complete(Screen.monitor())
+            asyncio.run(Screen.monitor())
 
     @classmethod
     async def monitor(cls):
-        await cls.is_shutdown
+        await cls.is_shutdown.wait()
+        asyncio.new_event_loop()  # Clear uasyncio retained state
 
     @classmethod
     def back(cls):
@@ -460,6 +470,7 @@ class Screen(object):
     def shutdown(cls):
         cls.tft.clr_scr()
         cls.is_shutdown.set()
+        cls.is_shutdown.clear()
 
     def __init__(self):
         self.touchlist = []
@@ -469,9 +480,8 @@ class Screen(object):
             tft = Screen.get_tft()
             if tft.text_font is None:
                 raise UguiException('The lcd set_font method has not been called')
-            loop = asyncio.get_event_loop()
-            loop.create_task(self._touchtest()) # One coro only
-            loop.create_task(self._garbage_collect())
+            asyncio.create_task(self._touchtest()) # One coro only
+            asyncio.create_task(self._garbage_collect())
         Screen.current_screen = self
         self.parent = None
 
@@ -572,7 +582,7 @@ class Aperture(Screen):
         return cls._value
 
 # Base class for all displayable objects
-class NoTouch(object):
+class NoTouch:
     _greyed_out = False # Disabled by user code
     def __init__(self, location, font, height, width, fgcolor, bgcolor, fontcolor, border, value, initial_value):
         Screen.addobject(self)
@@ -925,8 +935,7 @@ class Button(Touchable):
             self.show() # must be on current screen
             self.delay.trigger(Button.lit_time)
         if self.lp_callback is not None:
-            loop = asyncio.get_event_loop()
-            loop.create_task(self.longpress())
+            asyncio.create_task(self.longpress())
         if not self.onrelease:
             self.callback(self, *self.callback_args) # Callback not a bound method so pass self
 
@@ -943,7 +952,7 @@ class Button(Touchable):
 
 # Group of buttons, typically at same location, where pressing one shows
 # the next e.g. start/stop toggle or sequential select from short list
-class ButtonList(object):
+class ButtonList:
     def __init__(self, callback=dolittle):
         self.user_callback = callback
         self.lstbuttons = []
@@ -994,7 +1003,7 @@ class ButtonList(object):
 
 # Group of buttons at different locations, where pressing one shows
 # only current button highlighted and oes callback from current one
-class RadioButtons(object):
+class RadioButtons:
     def __init__(self, highlight, callback=dolittle, selected=0):
         self.user_callback = callback
         self.lstbuttons = []
