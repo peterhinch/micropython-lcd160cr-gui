@@ -1,6 +1,7 @@
 # micropython-lcd160gui
 
-V0.12 21st Sep 2020 Updated for (and requires) uasyncio V3.
+V0.13 20th Oct 2020 Support Jim Mussared's fast text rendering.
+V0.12 21st Sep 2020 Updated for (and requires) uasyncio V3.  
 V0.11 21st Feb 2017 This doc updated May 2019.
 
 Provides a simple touch driven event based GUI interface for the Pyboard when
@@ -51,6 +52,7 @@ The Plot module: Cartesian and polar graphs.
   1.1 [Pre installation](./README.md#11-pre-installation)  
   1.2 [Library Documentation](./README.md#12-library-documentation)  
   1.3 [Dependencies and Python files](./README.md#13-dependencies-and-python-files)  
+  1.4 [A performance boost](./README.md#14-a-performance-boost)  
 2. [Concepts](./README.md#2-concepts)  
   2.1 [Terminology](./README.md#21-terminology)  
   2.2 [Coordinates](./README.md#22-coordinates)  
@@ -155,6 +157,25 @@ files) may be implemented as frozen bytecode.
 
 It is also wise to issue ctrl-D to soft reset the Pyboard before importing a
 module which uses the library. The test programs require a ctrl-D before import.
+
+## 1.4 A performance boost
+
+This will only make a significant difference to applications which render
+substantial amounts of text using Python fonts.
+
+Rendering Python fonts is slow as it is performed pixel by pixel. A potential
+speedup is to use the `framebuf.blit` method but as standard it cannot render
+monochrome objects to color displays. A fix for this was developed by Jim
+Mussared (@jimmo) and consists of a native C module.
+
+On import, `lcd160_gui.py` attempts to import a module `framebuf_utils`. If
+this succeeds (i.e. a file `framebuf_utils.mpy` is found), rendering will be
+substantially faster.
+
+The directory `framebuf_utils` contains the source file, the makefile and a
+version of `framebuf_utils.mpy` for `armv7m` architecture (e.g. Pyboards). To
+install copy the directory and its contents to your device. On initialisation
+the message "Using fast mode" will be printed at the REPL.
 
 ###### [Jump to Contents](./README.md#contents)
 

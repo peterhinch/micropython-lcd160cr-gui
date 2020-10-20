@@ -26,6 +26,7 @@ from uctypes import bytearray_at, addressof
 try:
     from framebuf_utils import render
     fast_mode = True
+    print('Using fast mode')
 except ImportError:
     fast_mode = False
 import uasyncio as asyncio
@@ -339,14 +340,19 @@ class LCD160CR_G(LCD160CR):
         if self.text_x + cols >= self.w or self.text_y + rows >= self.h:
             return 0                        # Glyph is not entirely on screen
         fbuf = framebuf.FrameBuffer(self.glyph_buf, cols, rows, framebuf.RGB565)
-        div, mod = divmod(cols, 8)          # Horizontal mapping
-        gbytes = div + 1 if mod else div    # No. of bytes per row of glyph
-        for row in range(rows):
-            for col in range(cols):
-                gbyte, gbit = divmod(col, 8)
-                if gbit == 0:               # Next glyph byte
-                    data = glyph[row * gbytes + gbyte]
-                fbuf.pixel(col, row, fgcolor if data & (1 << (7 - gbit)) else bgcolor)
+        if fast_mode:
+            buf = bytearray_at(addressof(glyph), len(glyph))  # Object with buffer protocol
+            fbc = framebuf.FrameBuffer(buf, cols, rows, framebuf.MONO_HLSB)
+            render(fbuf, fbc, 0, 0, fgcolor, bgcolor)
+        else:
+            div, mod = divmod(cols, 8)          # Horizontal mapping
+            gbytes = div + 1 if mod else div    # No. of bytes per row of glyph
+            for row in range(rows):
+                for col in range(cols):
+                    gbyte, gbit = divmod(col, 8)
+                    if gbit == 0:               # Next glyph byte
+                        data = glyph[row * gbytes + gbyte]
+                    fbuf.pixel(col, row, fgcolor if data & (1 << (7 - gbit)) else bgcolor)
 
         self.set_spi_win(self.text_x, self.text_y, cols, rows)
         self.show_framebuf(fbuf)
