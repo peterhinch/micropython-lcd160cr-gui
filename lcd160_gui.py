@@ -23,6 +23,11 @@
 
 import framebuf
 from uctypes import bytearray_at, addressof
+try:
+    from framebuf_utils import render
+    fast_mode = True
+except ImportError:
+    fast_mode = False
 import uasyncio as asyncio
 import math
 import gc
