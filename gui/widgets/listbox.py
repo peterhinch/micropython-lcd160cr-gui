@@ -6,8 +6,8 @@
 # Usage:
 # from widgets.listbox import Listbox
 
-from core.lcd160_gui import Touchable, print_left, dolittle
-from core.constants import *
+from gui.core.lcd160_gui import Touchable, print_left, dolittle
+from gui.core.constants import *
 
 class Listbox(Touchable):
     def __init__(self, location, *, font, elements, width=80, value=0, border=2,

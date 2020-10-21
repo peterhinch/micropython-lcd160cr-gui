@@ -4,15 +4,15 @@
 # Copyright (c) 2016-2020 Peter Hinch
 
 # Usage:
-# import demos.ldd
+# import gui.demos.ldd
 
-from core.constants import *
-from core.lcd160_gui import Screen
+from gui.core.constants import *
+from gui.core.lcd160_gui import Screen
 import font10
-from widgets.buttons import Button, ButtonList
-from widgets.label import Label
-from widgets.listbox import Listbox
-from widgets.dropdown import Dropdown
+from gui.widgets.buttons import Button, ButtonList
+from gui.widgets.label import Label
+from gui.widgets.listbox import Listbox
+from gui.widgets.dropdown import Dropdown
 from lcd_local import setup
 
 # STANDARD BUTTONS

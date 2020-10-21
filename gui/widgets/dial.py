@@ -7,7 +7,7 @@
 # from widgets.dial import Dial
 
 import math
-from core.lcd160_gui import NoTouch
+from gui.core.lcd160_gui import NoTouch
 
 # class displays angles. Angle 0 is vertical, +ve increments are clockwise.
 class Dial(NoTouch):

@@ -8,8 +8,8 @@
 # or:
 # from widgets.sliders import HorizSlider
 
-from core.lcd160_gui import Touchable, get_stringsize, dolittle
-from widgets.label import Label
+from gui.core.lcd160_gui import Touchable, get_stringsize, dolittle
+from gui.widgets.label import Label
 # A slider's text items lie outside its bounding box (area sensitive to touch)
 
 # Buffer sizes: saved region is inclusive of pixels at x + width and y + height hence +1

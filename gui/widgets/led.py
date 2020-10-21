@@ -6,8 +6,8 @@
 # Usage:
 # from widgets.led import LED
 
-from core.lcd160_gui import NoTouch
-from core.constants import * 
+from gui.core.lcd160_gui import NoTouch
+from gui.core.constants import * 
 
 
 class LED(NoTouch):

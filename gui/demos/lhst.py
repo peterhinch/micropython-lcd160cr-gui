@@ -4,20 +4,20 @@
 # Copyright (c) 2016-2020 Peter Hinch
 
 # Usage:
-# import demos.lhst
+# import gui.demos.lhst
 
 import os
 import uasyncio as asyncio
 import font6
 import font10
-from core.constants import *
-from core.lcd160_gui import Screen
-from widgets.sliders import HorizSlider
-from widgets.buttons import Button, ButtonList
-from widgets.dial import Dial
-from widgets.label import Label
-from widgets.meter import Meter
-from widgets.led import LED 
+from gui.core.constants import *
+from gui.core.lcd160_gui import Screen
+from gui.widgets.sliders import HorizSlider
+from gui.widgets.buttons import Button, ButtonList
+from gui.widgets.dial import Dial
+from gui.widgets.label import Label
+from gui.widgets.meter import Meter
+from gui.widgets.led import LED 
 from lcd_local import setup
 
 # STANDARD BUTTONS

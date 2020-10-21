@@ -4,18 +4,19 @@
 # Copyright (c) 2016-2020 Peter Hinch
 
 # Usage:
-# import demos.vst
+# import gui.demos.vst
 
 import uasyncio as asyncio
 from math import pi
+
 import font6
 import font10
-from core.constants import *
-from core.lcd160_gui import Screen
-from widgets.sliders import Slider
-from widgets.buttons import Button, ButtonList
-from widgets.dial import Dial
-from widgets.label import Label
+from gui.core.constants import *
+from gui.core.lcd160_gui import Screen
+from gui.widgets.sliders import Slider
+from gui.widgets.buttons import Button, ButtonList
+from gui.widgets.dial import Dial
+from gui.widgets.label import Label
 from lcd_local import setup
 
 

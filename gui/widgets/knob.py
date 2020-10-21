@@ -7,7 +7,7 @@
 # from widgets.knob import Knob
 
 import math
-from core.lcd160_gui import Touchable, dolittle
+from gui.core.lcd160_gui import Touchable, dolittle
 TWOPI = 2 * math.pi
 
 

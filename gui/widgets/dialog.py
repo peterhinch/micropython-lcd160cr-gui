@@ -3,10 +3,10 @@
 # Released under the MIT License (MIT). See LICENSE.
 # Copyright (c) 2020 Peter Hinch
 
-from core.lcd160_gui import Aperture, Screen, get_stringsize, dolittle
-from widgets.label import Label
-from widgets.buttons import Button
-from core.constants import * 
+from gui.core.lcd160_gui import Aperture, Screen, get_stringsize, dolittle
+from gui.widgets.label import Label
+from gui.widgets.buttons import Button
+from gui.core.constants import * 
 
 # Usage:
 # from widgets.dialog import DialogBox

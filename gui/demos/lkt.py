@@ -4,18 +4,19 @@
 # Copyright (c) 2016-2020 Peter Hinch
 
 # Usage:
-# import demos.lkt
+# import gui.demos.lkt
 
-from core.constants import *
-from core.lcd160_gui import Screen
+from math import pi
+
+from gui.core.constants import *
+from gui.core.lcd160_gui import Screen
 import font6
 import font10
-from widgets.knob import Knob
-from widgets.dial import Dial
-from widgets.label import Label
-from widgets.buttons import Button, ButtonList
+from gui.widgets.knob import Knob
+from gui.widgets.dial import Dial
+from gui.widgets.label import Label
+from gui.widgets.buttons import Button, ButtonList
 from lcd_local import setup
-from math import pi
 
 # STANDARD BUTTONS
 

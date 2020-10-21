@@ -6,9 +6,9 @@
 # Usage:
 # from widgets.dropdown import Dropdown
 
-from core.lcd160_gui import Touchable, Aperture, Screen, print_left, dolittle
-from core.constants import *
-from widgets.listbox import Listbox
+from gui.core.lcd160_gui import Touchable, Aperture, Screen, print_left, dolittle
+from gui.core.constants import *
+from gui.widgets.listbox import Listbox
 
 class _ListDialog(Aperture):
     def __init__(self, location, dropdown, width):

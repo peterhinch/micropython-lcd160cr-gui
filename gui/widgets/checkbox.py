@@ -6,7 +6,7 @@
 # Usage:
 # from widgets.checkbox import Checkbox
 
-from core.lcd160_gui import Touchable, dolittle
+from gui.core.lcd160_gui import Touchable, dolittle
 
 class Checkbox(Touchable):
     def __init__(self, location, *, height=20, fillcolor=None,

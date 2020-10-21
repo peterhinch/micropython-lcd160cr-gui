@@ -6,8 +6,8 @@
 # Usage:
 # from widgets.label import Label
 
-from core.lcd160_gui import NoTouch, get_stringsize, print_left
-from core.constants import * 
+from gui.core.lcd160_gui import NoTouch, get_stringsize, print_left
+from gui.core.constants import * 
 
 class Label(NoTouch):
     def __init__(self, location, *, font, border=None, width=None, fgcolor=None, bgcolor=None, fontcolor=None, value=None):

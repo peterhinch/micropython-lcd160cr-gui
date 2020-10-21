@@ -3,13 +3,14 @@
 # Released under the MIT License (MIT). See LICENSE.
 # Copyright (c) 2020 Peter Hinch
 
-# Usage, import classes as required:
-# from widgets.buttons import Button, ButtonList, RadioButtons
+# Usage: import classes as required:
+# from gui.widgets.buttons import Button, ButtonList, RadioButtons
 
 import uasyncio as asyncio
-from core.lcd160_gui import Touchable, print_centered, dolittle
-from primitives.delay_ms import Delay_ms
-from core.constants import * 
+
+from gui.core.lcd160_gui import Touchable, print_centered, dolittle
+from gui.primitives.delay_ms import Delay_ms
+from gui.core.constants import * 
 
 # Button coordinates relate to bounding box (BB). x, y are of BB top left corner.
 # likewise width and height refer to BB, regardless of button shape

@@ -6,8 +6,8 @@
 # Usage:
 # from widgets.meter import Meter
 
-from core.lcd160_gui import NoTouch, print_centered
-from core.constants import * 
+from gui.core.lcd160_gui import NoTouch, print_centered
+from gui.core.constants import * 
 
 
 class Meter(NoTouch):

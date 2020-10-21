@@ -4,15 +4,15 @@
 # Copyright (c) 2016-2020 Peter Hinch
 
 # Usage:
-# import demos.lbt
+# import gui.demos.lbt
 
-from core.constants import *
-from core.lcd160_gui import Screen
+from gui.core.constants import *
+from gui.core.lcd160_gui import Screen
 import font10
-from widgets.buttons import Button, ButtonList, RadioButtons
-from widgets.label import Label
-from widgets.dropdown import Dropdown
-from widgets.checkbox import Checkbox
+from gui.widgets.buttons import Button, ButtonList, RadioButtons
+from gui.widgets.label import Label
+from gui.widgets.dropdown import Dropdown
+from gui.widgets.checkbox import Checkbox
 from lcd_local import setup
 
 # STANDARD BUTTONS

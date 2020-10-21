@@ -1,13 +1,11 @@
-TODO
-Installation
-lbt skips screens sometimes
+# A touch GUI for the official MicroPython display
 
-# micropython-lcd160gui
+V0.20 21st Oct 2020 Refactor as a Python package. The refactor is a breaking
+change: applications must adapt `import` statements. There is now no need to
+cross compile on a Pyboard 1.1. Unused widgets no longer consume RAM. The
+structure also facilitates adding new widgets.
 
-V0.20 20th Oct 2020 Refactor as a Python package. Support Jim Mussared's fast
-text rendering. The refactor is a breaking change: applications will need to
-change import statements. The aim is to remove the need for cross compilation.
-Unused widgets no longer consume RAM. This also facilitates adding new widgets.
+Supports Jim Mussared's fast text rendering.
 
 V0.12 21st Sep 2020 Updated for (and requires) uasyncio V3.  
 
@@ -59,6 +57,7 @@ The Plot module: Cartesian and polar graphs.
   1.1 [Pre installation](./README.md#11-pre-installation)  
   1.2 [Library Documentation](./README.md#12-library-documentation)  
   1.3 [Installation](./README.md#13-installation)  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.3.1 [ESP32](./README.md#131-esp32)  
   1.4 [Dependencies and Python files](./README.md#14-dependencies-and-python-files)  
   1.5 [A performance boost](./README.md#15-a-performance-boost)  
 2. [Concepts](./README.md#2-concepts)  
@@ -111,27 +110,38 @@ Documentation for the underlying libraries may be found at these sites.
 [lcd160cr driver](http://docs.micropython.org/en/latest/pyboard/library/lcd160cr.html#touch-screen-methods)  
 
 Other references:  
-[Proposed standard font format](https://github.com/peterhinch/micropython-font-to-py)  
-[uasyncio libraries and notes](https://github.com/peterhinch/micropython-async)  
+[Font format](https://github.com/peterhinch/micropython-font-to-py)  
+[uasyncio tutorial](https://github.com/peterhinch/micropython-async/blob/master/v3/docs/TUTORIAL.md)  
 
 ## 1.3 Installation
 
-This comprises copying files and directories to the root directory on the
-target (typically `/flash` or `/sd`). The demos and their associated font
+The file `lcd_local.py` defines the hardware connection and should be edited to
+match your hardware. On Pyboard D plugged into the back of a display select the
+"X" connection. Edit if you plan to use fonts bigger than 23*23 pixels. See
+[External fonts](./README.md#81-external-fonts).
 
-Clone the repo [uasyncio libraries and notes](https://github.com/peterhinch/micropython-async)
-to your PC and navigate to the V3 directory. Copy the directory `primitives`
-and its contents to the device. If space in the filesystem is limited, only
-these files are required:
- 1. `__init__.py`
- 2. `delay_ms.py`
+Copy the following files to the root directory on the target (on Pyboard
+`/flash` or `/sd`):
+ 1. `lcd_local.py`
+ 2. `font6.py` (Font files not required if frozen as bytecode).
+ 3. `font10.py`
 
-Copy the following files to the root directory on the target (`/flash` or
-`/sd`):  
-`lcd160cr.py`, `lcd160_gui.py`, `lcd_local.py`, `constants.py`, `lplot.py`
-(optional)  
-Copy the following directories with their contents to the root:  
-`widgets`, `demos` (optional), `framebuf_utils` (optional, see below).
+Copy the `gui` directory and contents to the root directory on the target. If
+using [rshell](https://github.com/dhylands/rshell) this may be done from the
+directory containing `gui` with:
+```bash
+> rsync gui /sd/gui
+```
+
+### 1.3.1 ESP32
+
+The library can be installed on ESP32. The file `lcd_local_esp.py` should be
+copied to `/pyboard/lcd_local.py` after making any edits to support your
+physical connection and maximum font size.
+
+[Fast mode](./README.md#15-a-performance-boost) will fail because the example
+is compiled for STM architecture. Options are to recompile for `xtensawin` or
+to disable fast mode by deleting `gui/framebuf_utils/framebuf_utils.mpy`.
 
 ## 1.4 Dependencies and Python files
 
@@ -139,25 +149,23 @@ Version 3 of uasyncio is included in firmware V1.13 and later. This is a
 requirement.
 
 Files in top level directory:
- 1. `lcd_local.py` Local hardware definition. This file should be edited to
- match your hardware. On Pyboard D select the "X" connection.
- 2. `font6.py` Font files used in demos. These may be frozen as bytecode to
- conserve RAM.
- 3. `font10.py`
- 4. `font14.py`
+ 1. `lcd_local.py`
+ 2. `font6.py` Font file used in demos.
+ 3. `font10.py` Ditto.
+ 4. `font14.py` Unused example of max font size using unmodified `lcd_local`.
 
-The fonts are generated from the free font FreeSans.ttf. See
-[External fonts](./README.md#81-external-fonts).
+Fonts are generated from the free font FreeSans.ttf. You can generate your own,
+see [External fonts](./README.md#81-external-fonts).
 
-Core files in `core` directory:
+Core files in `core` subdirectory:
  1. `lcd160cr.py` Official driver. Check for a newer version in the source tree
  (`drivers/display`).
  2. `lcd160_gui.py` The micro GUI library.
  3. `constants.py` Constants such as colors and shapes (import using
- `from core.constants import *`).
+ `from gui.core.constants import *`).
  4. `lplot.py` Optional graph plotting extension.
 
-Test/demo programs in `demos` directory:
+Test/demo programs in `demos` subdirectory:
  1. `lvst.py` A test program for vertical linear sliders. Also demos an
  asynchronous coroutine and linked sliders.
  2. `lhst.py` Tests horizontal slider controls, meter and LED. Demos
@@ -170,24 +178,28 @@ Test/demo programs in `demos` directory:
  6. `ldb.py` Modal dialog boxes.
  7. `ldb_if.py` As above but using an internal font.
  8. `lpt.py` Demo of plot module.
- 9. `lptg.py` Plot with `TSequence` real time data acquisition.
+ 9. `lptg.py` Plot with `TSequence` simulated real time data acquisition.
 
-Synchronisation primitives in `primitives` directory. This directory has a
-minimum subset
+Synchronisation primitives in `primitives` subdirectory.  
+Widgets in `widgets` subdirectory.
 
+Demos are run with the following syntax:
+```python
+>>> import gui.demos.lbt
+```
 The organisation as a Python package means that cross compilation of
 `lcd160_gui.py` is no longer required on a Pyboard 1.1. To conserve RAM it is
 recommended that font files are implemented as frozen bytecode. To further
-reduce RAM this may be applied to other Python files.
+reduce RAM this may be applied to other Python files, but the directory
+structure must be maintained.
 
 It is wise to issue ctrl-D to soft reset the Pyboard before importing a module
 which uses the library. The test programs require a ctrl-D before import.
 
-
 ## 1.5 A performance boost
 
-This will only make a significant difference to applications which render
-substantial amounts of text using Python fonts.
+This will only make a visible difference to applications rendering substantial
+amounts of text using Python fonts.
 
 Rendering Python fonts is slow as it is performed pixel by pixel. A potential
 speedup is to use the `framebuf.blit` method but as standard it cannot render
@@ -202,6 +214,9 @@ The directory `framebuf_utils` contains the source file, the makefile and a
 version of `framebuf_utils.mpy` for `armv7m` architecture (e.g. Pyboards). To
 install copy the directory and its contents to your device. On initialisation
 the message "Using fast mode" will be printed at the REPL.
+
+On other architectures `framebuf_utils.mpy` should be recompiled or deleted to
+disable fast mode.
 
 ###### [Jump to Contents](./README.md#contents)
 
@@ -275,8 +290,9 @@ The following illustrates the structure of a minimal program:
 ```python
 from lcd_local import setup
 import font10
-from constants import *
-from lcd160_gui import Screen, Button
+from gui.core.constants import *
+from gui.core.lcd160_gui import Screen
+from gui.widgets.buttons import Button
 def quitbutton():
     def quit(button):
         Screen.shutdown()
@@ -301,9 +317,9 @@ and the scheduler is stopped (`Screen.shutdown()`).
 This is performed by `lcd_local.py` which instantiates an `LCD160CR_G`
 display. This class is derived from the official driver's `LCD160CR` class:
 the documentation for the latter may be viewed
-[here](http://docs.micropython.org/en/latest/pyboard/library/lcd160cr.html#lcd160cr.LCD160CR.set_spi_win).
+[here](http://docs.micropython.org/en/latest/library/lcd160cr.html).
 An additional optional constructor keyword argument `bufsize` is available.
-See section 8 (Fonts) for its use.
+See [External fonts](./README.md#81-external-fonts) for its use.
 
 ###### [Jump to Contents](./README.md#contents)
 
@@ -322,8 +338,10 @@ on the screen. The following presents an outline of this approach:
 ```python
 from lcd_local import setup
 import font10
-from constants import *
-from lcd160_gui import Screen, Button, Label
+from gui.core.constants import *
+from gui.core.lcd160_gui import Screen
+from gui.widgets.buttons import Button
+from gui.widgets.label import Label
 def backbutton(x, y):
     def back(button):
         Screen.back()
