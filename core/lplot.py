@@ -25,12 +25,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-from lcd160_gui import NoTouch, Screen
-from constants import *
+
 from math import pi
 from cmath import rect
 from micropython import const
 from array import array
+
+from core.lcd160_gui import NoTouch, Screen
+from core.constants import *
 
 type_gen = type((lambda: (yield))())  # type of a generator
 

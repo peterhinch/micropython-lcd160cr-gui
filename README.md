@@ -1,12 +1,19 @@
+TODO
+Installation
+lbt skips screens sometimes
+
 # micropython-lcd160gui
 
-V0.13 20th Oct 2020 Support Jim Mussared's fast text rendering.
+V0.20 20th Oct 2020 Refactor as a Python package. Support Jim Mussared's fast
+text rendering. The refactor is a breaking change: applications will need to
+change import statements. The aim is to remove the need for cross compilation.
+Unused widgets no longer consume RAM. This also facilitates adding new widgets.
+
 V0.12 21st Sep 2020 Updated for (and requires) uasyncio V3.  
-V0.11 21st Feb 2017 This doc updated May 2019.
 
 Provides a simple touch driven event based GUI interface for the Pyboard when
 used with the official LCD160CR colour display. It is based on the official
-driver and uses uasyncio for scheduling. The V1.1 display enables a Pyboard D
+driver and uses `uasyncio` for scheduling. The V1.1 display enables a Pyboard D
 to be plugged in. The GUI has been tested in this configuration.
 
 It is targeted at hardware control and display applications. GUI objects are
@@ -51,8 +58,9 @@ The Plot module: Cartesian and polar graphs.
 1. [Pre requisites](./README.md#1-pre-requisites)  
   1.1 [Pre installation](./README.md#11-pre-installation)  
   1.2 [Library Documentation](./README.md#12-library-documentation)  
-  1.3 [Dependencies and Python files](./README.md#13-dependencies-and-python-files)  
-  1.4 [A performance boost](./README.md#14-a-performance-boost)  
+  1.3 [Installation](./README.md#13-installation)  
+  1.4 [Dependencies and Python files](./README.md#14-dependencies-and-python-files)  
+  1.5 [A performance boost](./README.md#15-a-performance-boost)  
 2. [Concepts](./README.md#2-concepts)  
   2.1 [Terminology](./README.md#21-terminology)  
   2.2 [Coordinates](./README.md#22-coordinates)  
@@ -91,12 +99,6 @@ The Plot module: Cartesian and polar graphs.
 Before running the GUI the hardware should be tested by working through the
 [tutorial](https://docs.micropython.org/en/latest/pyboard/pyboard/tutorial/lcd160cr_skin.html).
 
-Owing to the size of the library and depending on the size of your application
-it may be necessary to freeze modules as bytecode. Users should therefore be
-familiar with building Micropython from source, and installing Python modules
-as persistent bytecode. Instructions on doing this may be found
-[here](http://forum.micropython.org/viewtopic.php?f=6&t=1776).
-
 Familiarity with callbacks and event driven programming will assist in
 developing applications. No knowledge of `uasyncio` is required for application
 development as the API is callback-based, but the GUI is compatible with
@@ -112,10 +114,10 @@ Other references:
 [Proposed standard font format](https://github.com/peterhinch/micropython-font-to-py)  
 [uasyncio libraries and notes](https://github.com/peterhinch/micropython-async)  
 
-## 1.3 Dependencies and Python files
+## 1.3 Installation
 
-Version 3 of uasyncio is included in firmware V1.13 and later. This is a
-requirement.
+This comprises copying files and directories to the root directory on the
+target (typically `/flash` or `/sd`). The demos and their associated font
 
 Clone the repo [uasyncio libraries and notes](https://github.com/peterhinch/micropython-async)
 to your PC and navigate to the V3 directory. Copy the directory `primitives`
@@ -124,19 +126,38 @@ these files are required:
  1. `__init__.py`
  2. `delay_ms.py`
 
-Core files:
- 1. `lcd160_gui.py` The micro GUI library.
- 2. `lcd_local.py` Local hardware definition. This file should be edited to
+Copy the following files to the root directory on the target (`/flash` or
+`/sd`):  
+`lcd160cr.py`, `lcd160_gui.py`, `lcd_local.py`, `constants.py`, `lplot.py`
+(optional)  
+Copy the following directories with their contents to the root:  
+`widgets`, `demos` (optional), `framebuf_utils` (optional, see below).
+
+## 1.4 Dependencies and Python files
+
+Version 3 of uasyncio is included in firmware V1.13 and later. This is a
+requirement.
+
+Files in top level directory:
+ 1. `lcd_local.py` Local hardware definition. This file should be edited to
  match your hardware. On Pyboard D select the "X" connection.
+ 2. `font6.py` Font files used in demos. These may be frozen as bytecode to
+ conserve RAM.
+ 3. `font10.py`
+ 4. `font14.py`
+
+The fonts are generated from the free font FreeSans.ttf. See
+[External fonts](./README.md#81-external-fonts).
+
+Core files in `core` directory:
+ 1. `lcd160cr.py` Official driver. Check for a newer version in the source tree
+ (`drivers/display`).
+ 2. `lcd160_gui.py` The micro GUI library.
  3. `constants.py` Constants such as colors and shapes (import using
- `from constants import *`).
+ `from core.constants import *`).
+ 4. `lplot.py` Optional graph plotting extension.
 
-Optional files used by test programs:
- 1. `font6.py` Font file.
- 2. `font10.py` Ditto.
- 3. `font14.py` Ditto. These are generated from the free font FreeSans.ttf.
-
-Test/demo programs:
+Test/demo programs in `demos` directory:
  1. `lvst.py` A test program for vertical linear sliders. Also demos an
  asynchronous coroutine and linked sliders.
  2. `lhst.py` Tests horizontal slider controls, meter and LED. Demos
@@ -148,17 +169,22 @@ Test/demo programs:
  5. `ldd.py` Dropdown list and Listbox controls.
  6. `ldb.py` Modal dialog boxes.
  7. `ldb_if.py` As above but using an internal font.
+ 8. `lpt.py` Demo of plot module.
+ 9. `lptg.py` Plot with `TSequence` real time data acquisition.
 
-By the standards of the Pyboard this is a large library. The `lcd160_gui.py`
-program is too large to be compiled on-board (unless using a Pyboard D) and
-must be cross-compiled. The test programs have been run with a standard
-firmware build. If memory problems are encountered Python code (including font
-files) may be implemented as frozen bytecode.
+Synchronisation primitives in `primitives` directory. This directory has a
+minimum subset
 
-It is also wise to issue ctrl-D to soft reset the Pyboard before importing a
-module which uses the library. The test programs require a ctrl-D before import.
+The organisation as a Python package means that cross compilation of
+`lcd160_gui.py` is no longer required on a Pyboard 1.1. To conserve RAM it is
+recommended that font files are implemented as frozen bytecode. To further
+reduce RAM this may be applied to other Python files.
 
-## 1.4 A performance boost
+It is wise to issue ctrl-D to soft reset the Pyboard before importing a module
+which uses the library. The test programs require a ctrl-D before import.
+
+
+## 1.5 A performance boost
 
 This will only make a significant difference to applications which render
 substantial amounts of text using Python fonts.

@@ -1,36 +1,24 @@
 # lpt.py Test/demo of graph plotting extension for Pybboard TFT GUI
 # Now tests clipping of overrange data.
 
-# The MIT License (MIT)
-#
-# Copyright (c) 2017 Peter Hinch
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
+# Released under the MIT License (MIT). See LICENSE.
+# Copyright (c) 2016-2020 Peter Hinch
+
+# Usage:
+# import demos.lpt
 
 import uasyncio as asyncio
-from lplot import PolarGraph, PolarCurve, CartesianGraph, Curve
-from lcd160_gui import Button, Label, Screen
-from constants import *
-from lcd_local import setup
-import font10
 from math import sin, cos, pi
 from cmath import rect
+
+from core.lplot import PolarGraph, PolarCurve, CartesianGraph, Curve
+from core.lcd160_gui import Screen
+from core.constants import *
+import font10
+from widgets.buttons import Button
+from widgets.label import Label 
+
+from lcd_local import setup
 
 # STANDARD BUTTONS
 
