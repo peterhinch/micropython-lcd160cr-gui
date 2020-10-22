@@ -214,13 +214,15 @@ class BaseScreen(Screen):
         ]
         quitbutton()
         Label((0, 0), font = font10, value = 'Choose screen')
-        self.lst_en_dis = []
+        self.lst_en_dis = []  # List of objects controlled by Enable/Disable
+        def rbcb(button, screen):  # RadioButton callback
+            Screen.change(screen)
+        rb = RadioButtons(BLUE, rbcb) # color of selected button
+        self.lst_en_dis.append(rb)
         x = 0
         for t in table_highlight:
-            b = Button((x, 25), font = font10, shape = CIRCLE, fgcolor = BLUE,
-                       fontcolor = BLACK, callback = self.callback,
-                       height = 30, **t)
-            self.lst_en_dis.append(b)
+            rb.add_button((x, 25), font = font10, shape = CIRCLE, fgcolor = BLUE,
+                          fontcolor = BLACK, height = 30, **t)
             x += 43
 # Enable/Disable toggle 
         self.bs_en = ButtonList(self.cb_en_dis)
@@ -229,9 +231,6 @@ class BaseScreen(Screen):
         self.bs_en.add_button((0, 107), font = font10, fontcolor = BLACK, width = 60,
                               fgcolor = RED, text = 'Enable', args = (False,))
 
-
-    def callback(self, button, screen):
-        Screen.change(screen)
 
     def cb_en_dis(self, button, disable):
         for item in self.lst_en_dis:

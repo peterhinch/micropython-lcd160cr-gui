@@ -14,8 +14,9 @@
 # height * max_width * 2 for the largest font in use.
 # Default 1058 bytes, allowing fonts upto 23*23 pixels (font14.py)
 
-import lcd160cr
-from lcd160_gui import Screen, LCD160CR_G
+from gui.core import lcd160cr
+from gui.core.lcd160_gui import Screen, LCD160CR_G
+
 from machine import Pin, I2C, SPI
 
 def setup():
