@@ -69,11 +69,16 @@ The Plot module: Cartesian and polar graphs.
 3. [Program Structure](./README.md#3-program-structure)  
   3.1 [Initialisation](./README.md#31-initialisation)  
 4. [Class Screen](./README.md#4-class-screen)  
+  4.1 [Class methods](./README.md#41-class-methods)  
+  4.2 [Constructor](./README.md#42-constructor)  
+  4.3 [Callback methods](./README.md#43-callback-methods)  
+  4.4 [Method](./README.md#44-method)  
 5. [Display Classes](./README.md#5-display-classes)  
   5.1 [Class Label](./README.md#51-class-label)  
   5.2 [Class Dial](./README.md#52-class-dial)  
   5.3 [Class LED](./README.md#53-class-led)  
   5.4 [Class Meter](./README.md#54-class-meter)  
+  5.5 [Vector display](./README.md#55-vector-display)  
 6. [Control Classes](./README.md#6-control-classes)  
   6.1 [Class Slider](./README.md#61-class-slider)  
   6.2 [Class Knob](./README.md#62-class-knob)  
@@ -179,6 +184,7 @@ Test/demo programs in `demos` subdirectory:
  7. `ldb_if.py` As above but using an internal font.
  8. `lpt.py` Demo of plot module.
  9. `lptg.py` Plot with `TSequence` simulated real time data acquisition.
+ 10. `vtest.py` Test of vector display.
 
 Synchronisation primitives in `primitives` subdirectory.  
 Widgets in `widgets` subdirectory.
@@ -192,9 +198,6 @@ The organisation as a Python package means that cross compilation of
 recommended that font files are implemented as frozen bytecode. To further
 reduce RAM this may be applied to other Python files, but the directory
 structure must be maintained.
-
-It is wise to issue ctrl-D to soft reset the Pyboard before importing a module
-which uses the library. The test programs require a ctrl-D before import.
 
 ## 1.5 A performance boost
 
@@ -414,6 +417,16 @@ These do nothing, and may be defined in subclasses if required.
  * `after_open` Called after a screen has been displayed.
  * `on_hide` Called when a screen ceases to be current.
 
+## 4.4 Method
+
+ * `reg_task` args `task`, `on_change=False`. The first arg may be a `Task`
+ instance or a coroutine. It is a convenience method which provides for the
+ automatic cancellation of tasks. If a screen runs independent coros it can opt
+ to register these. On shudown, any registered tasks of the base screen are
+ cancelled. On screen change, registered tasks with `on_change` `True` are
+ cancelled. For finer control applications can ignore this method and handle
+ cancellation explicitly in code.
+
 ###### [Jump to Contents](./README.md#contents)
 
 # 5. Display Classes
@@ -527,6 +540,47 @@ Methods:
 
 ###### [Jump to Contents](./README.md#contents)
 
+## 5.5 Vector display
+
+Provides a means of displaying one or more vectors. A vector is a `complex`
+with magnitude in the range of 0 to 1.0. In use a `VectorDial` is instantiated,
+followed by a `Pointer` instance for each vector to be displayed on it. The
+`VectorDial` can display its vectors as lines (as on a clock face) or as arrows
+(as on a compass).
+
+By contrast with the `Dial` class the pointers have lengths and colors which
+can vary dynamically.
+```python
+from micropython_ra8875.widgets.vectors import Pointer, VectorDial
+```
+
+### Class VectorDial
+
+Constructor mandatory positional argument:
+ 1. `location` 2-tuple defining position.
+
+Keyword only arguments (all optional):  
+ * `height=100` Dimension of the square bounding box.
+ * `fgcolor=None` Foreground color. Defaults to system color.
+ * `bgcolor=None` Background color of object. Defaults to system background.
+ * `border=None` Border width in pixels - typically 2. Default: no border.
+ * `ticks=4` Defines the number of graduations around the dial.
+ * `arrow=False` If `True` vectors will appear as arrows.
+ * `pip=None` By default a small circular "pip" is drawn at the centre of the
+ dial. If `False` is passed this is omitted. If a color is passed, it will be
+ drawn using that color. If the shortest pointer has a length below a threshold
+ the "pip" is omitted to ensure visibility.
+
+### Class Pointer
+
+Constructor mandatory positional arg:
+ * `dial` The dial on which it is to be displayed.
+
+Method:
+ * `value` Args `v=None, col=None`. Returns the current value. If a `complex`
+ is passed as the value `v` it is scaled to ensure its magnitude is <= 1 and
+ the pointer is redrawn. If a color is passed as `col` the pointer's color is
+ updated.
 
 # 6. Control Classes
 
@@ -682,7 +736,7 @@ Optional keyword only arguments:
  * `callback` Callback function which runs when button is pressed.
  * `args` A list/tuple of arguments for the above callback. Default `[]`.
  * `onrelease` Default `True`. If `True` the callback will occur when the
- button is released otherwise it will occur when pressed.
+ button is released otherwise it will occur when pressed. See note below.
  * `lp_callback` Callback to be used if button is to respond to a long press.
  Default `None`.
  * `lp_args` A list/tuple of arguments for above callback. Default `[]`.
@@ -695,6 +749,10 @@ Method:
 Class variables:
  * `lit_time` Period in seconds the `litcolor` is displayed. Default 1.
  * `long_press_time` Press duration for a long press. Default 1 second.
+
+Note: if button callbacks change screens, `onrelease` should be set `False`.
+This avoids multiple screen changes if more than one such button is pressed
+simultaneously.
 
 ###### [Jump to Contents](./README.md#contents)
 

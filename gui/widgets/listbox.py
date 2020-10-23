@@ -11,7 +11,7 @@ from gui.core.constants import *
 
 class Listbox(Touchable):
     def __init__(self, location, *, font, elements, width=80, value=0, border=2,
-                 fgcolor=None, bgcolor=None, fontcolor=None, select_color=LIGHTBLUE,
+                 fgcolor=None, bgcolor=None, fontcolor=None, select_color=DARKBLUE,
                  callback=dolittle, args=[]):
         self.entry_height = font.height() + 2 # Allow a pixel above and below text
         bw = border if border is not None else 0 # Replicate Touchable ctor's handling of self.border

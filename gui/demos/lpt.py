@@ -31,8 +31,7 @@ def fwdbutton(x, y, screen, text='Next'):
     def fwd(button, screen):
         Screen.change(screen)
     return Button((x, y), font = font10, fontcolor = BLACK, callback = fwd,
-                  args = [screen], fgcolor = CYAN, text = text)
-
+                  onrelease = False, args = [screen], fgcolor = CYAN, text = text)
 
 def backbutton():
     def back(button):
@@ -181,8 +180,7 @@ class RealtimeScreen(Screen):
         self.buttonlist.append(refreshbutton((curve,)))
 
     def populate(self, curve):
-        loop = asyncio.get_event_loop()
-        loop.create_task(self.acquire(curve))
+        self.reg_task(self.acquire(curve))
 
     async def acquire(self, curve):
         for but in self.buttonlist:

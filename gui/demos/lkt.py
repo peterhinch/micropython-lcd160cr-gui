@@ -31,7 +31,7 @@ class KnobScreen(Screen):
         super().__init__()
         quitbutton()
         self.dial = Dial((106, 0), fgcolor = YELLOW, border = 2, pointers = (0.9, 0.7))
-        k0 = Knob((0, 0), fgcolor = GREEN, bgcolor=(0, 0, 80), color = (168, 63, 63),
+        k0 = Knob((0, 0), fgcolor = GREEN, bgcolor=DARKBLUE, color = (168, 63, 63),
                   border = 2, cb_end = self.callback, cbe_args = ['Knob1'],
                   cb_move = self.knob_moved, cbm_args = (0,))
         k1 = Knob((53, 0), fgcolor = WHITE, border = 2, arc = pi * 1.5,

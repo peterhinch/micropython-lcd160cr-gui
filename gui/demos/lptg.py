@@ -31,12 +31,10 @@ def fwdbutton(x, y, screen, text='Next'):
     def fwd(button, screen):
         Screen.change(screen)
     return Button((x, y), font = font10, fontcolor = BLACK, callback = fwd,
-                  args = [screen], fgcolor = CYAN, text = text)
+                  onrelease = False, args = [screen], fgcolor = CYAN, text = text)
 
-
-def backbutton(cb=lambda *_: None):
+def backbutton():
     def back(button):
-        cb()
         Screen.back()
     return Button((139, 0), font = font10, fontcolor = BLACK, callback = back,
            fgcolor = RED,  text = 'X', height = 20, width = 20)
@@ -186,8 +184,7 @@ class RealtimeScreen(Screen):
         self.buttonlist.append(refreshbutton((curve,)))
 
     def go(self, curve):
-        loop = asyncio.get_event_loop()
-        loop.create_task(self.acquire(curve))
+        self.reg_task(self.acquire(curve))
 
     async def acquire(self, curve):
         for but in self.buttonlist:
@@ -210,15 +207,12 @@ class RealtimeScreen(Screen):
 
 class Tseq(Screen):
     def __init__(self):
-        global acq_task
         super().__init__()
-        def cancel():
-            acq_task.cancel()
-        backbutton(cancel)
+        backbutton()
         g = CartesianGraph((0, 0), height = 127, width = 127, xorigin = 10)
         tsy = TSequence(g, YELLOW, 50)
         tsr = TSequence(g, RED, 50)
-        acq_task = asyncio.create_task(self.acquire(g, tsy, tsr))
+        self.reg_task(self.acquire(g, tsy, tsr), on_change=True)
 
     async def acquire(self, graph, tsy, tsr):
         t = 0.0

@@ -37,7 +37,7 @@ class _ListDialog(Aperture):
  
 class Dropdown(Touchable):
     def __init__(self, location, *, font, elements, width=100, value=0,
-                 fgcolor=None, bgcolor=None, fontcolor=None, select_color=LIGHTBLUE,
+                 fgcolor=None, bgcolor=None, fontcolor=None, select_color=DARKBLUE,
                  callback=dolittle, args=[]):
         border = 2
         self.entry_height = font.height() + 2 # Allow a pixel above and below text

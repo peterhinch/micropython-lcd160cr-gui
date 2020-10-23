@@ -85,7 +85,7 @@ class RadioScreen(Screen):
         self.rb0 = None
         for t in table:
             button = self.rb.add_button((x, 30), shape = CIRCLE, font = font10, fontcolor = WHITE,
-                                fgcolor = (0, 0, 90), height = 30, width = 30, **t)
+                                fgcolor = DARKBLUE, height = 30, width = 30, **t)
             if self.rb0 is None: # Save for reset button callback
                 self.rb0 = button
             x += 43
@@ -207,23 +207,22 @@ class BaseScreen(Screen):
     def __init__(self):
         super().__init__()
         table_highlight = [
-            {'text' : '1', 'args' : (HighlightScreen,)},
-            {'text' : '2', 'args' : (RadioScreen,)},
-            {'text' : '3', 'args' : (AssortedScreen,)},
-            {'text' : '4', 'args' : (CheckboxScreen,)},
+            {'text' : 'Highlight', 'args' : (HighlightScreen,)},
+            {'text' : 'Radio', 'args' : (RadioScreen,)},
+            {'text' : 'Assorted', 'args' : (AssortedScreen,)},
+            {'text' : 'Checkbox', 'args' : (CheckboxScreen,)},
         ]
         quitbutton()
-        Label((0, 0), font = font10, value = 'Choose screen')
         self.lst_en_dis = []  # List of objects controlled by Enable/Disable
         def rbcb(button, screen):  # RadioButton callback
             Screen.change(screen)
         rb = RadioButtons(BLUE, rbcb) # color of selected button
         self.lst_en_dis.append(rb)
-        x = 0
+        y = 0
         for t in table_highlight:
-            rb.add_button((x, 25), font = font10, shape = CIRCLE, fgcolor = BLUE,
-                          fontcolor = BLACK, height = 30, **t)
-            x += 43
+            rb.add_button((0, y), font = font10, fgcolor = DARKBLUE,
+                          onrelease=False, width = 80, fontcolor = WHITE, **t)
+            y += 25
 # Enable/Disable toggle 
         self.bs_en = ButtonList(self.cb_en_dis)
         self.bs_en.add_button((0, 107), font = font10, fontcolor = BLACK, width = 60,

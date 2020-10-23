@@ -28,9 +28,14 @@ ClassType = type(_A)
 class UguiException(Exception):
     pass
 
-# replaces lambda *_ : None owing to issue #2023
-def dolittle(*_):
+# Null function
+dolittle = lambda *_ : None
+
+async def _g():
     pass
+type_coro = type(_g())
+
+# *********** INTERNAL FONTS ***********
 
 class IFont:
     size = ((4, 5), (6, 7), (8, 8), (9, 13))  # (w, h) for each font
@@ -65,6 +70,7 @@ class IFont:
     def monospaced(self):
         return True
 
+# *********** STRINGS ***********
 
 def get_stringsize(s, font):
     if isinstance(font, IFont):
@@ -410,6 +416,10 @@ class Screen:
         init = cls.current_screen is None
         if init:
             Screen() # Instantiate a blank starting screen
+        else:  # About to erase an existing screen
+            for entry in cls.current_screen.tasklist:
+                if entry[1]:  # To be cancelled on screen change
+                    entry[0].cancel()
         cs_old = cls.current_screen
         cs_old.on_hide() # Optional method in subclass
         if forward:
@@ -426,12 +436,18 @@ class Screen:
         cs_new._do_open(cs_old) # Clear and redraw
         cs_new.after_open() # Optional subclass method
         if init:
-            asyncio.run(Screen.monitor())
+            try:
+                asyncio.run(Screen.monitor())
+            finally:
+                asyncio.new_event_loop()
 
     @classmethod
     async def monitor(cls):
         await cls.is_shutdown.wait()
-        asyncio.new_event_loop()  # Clear uasyncio retained state
+        for entry in cls.current_screen.tasklist:
+            entry[0].cancel()
+        await asyncio.sleep_ms(0)  # Allow subclass to cancel tasks
+        cls.current_screen = None  # Ensure another demo can run
 
     @classmethod
     def back(cls):
@@ -456,6 +472,7 @@ class Screen:
     def __init__(self):
         self.touchlist = []
         self.displaylist = []
+        self.tasklist = []  # Allow instance to register tasks for shutdown
         self.modal = False
         if Screen.current_screen is None: # Initialising class and coro
             tft = Screen.get_tft()
@@ -470,6 +487,8 @@ class Screen:
         touch_panel = Screen.tft
         while True:
             await asyncio.sleep_ms(0)
+            tl = Screen.current_screen.touchlist
+            ids = id(Screen.current_screen)
             touched, x, y = touch_panel.get_touch()
             if touched:
                 # The following fixes a problem with the driver/panel where the first
@@ -479,16 +498,15 @@ class Screen:
                 if touched:  # Still touched: update x and y with the latest values
                     x = xx
                     y = yy
-                for obj in Screen.current_screen.touchlist:
-                    if obj.visible and not obj.greyed_out():
-                        obj._trytouch(x, y)
+                for obj in iter(a for a in tl if a.visible and not a.greyed_out()):
+                    obj._trytouch(x, y)  # Run user "on press" callback if touched
+                    if ids != id(Screen.current_screen):  # cb may have changed screen
+                        break  # get new touchlist
             else:
-                for obj in Screen.current_screen.touchlist:
-                    if obj.was_touched:
-                        obj.was_touched = False # Call _untouched once only
-                        obj.busy = False
-                        obj._untouched()
-
+                for obj in iter(a for a in tl if a.was_touched):
+                    obj.was_touched = False # Call _untouched once only
+                    obj.busy = False
+                    obj._untouched()  # Run "on release" callback
 
     def _do_open(self, old_screen): # Aperture overrides
         show_all = True
@@ -516,6 +534,11 @@ class Screen:
 
     def on_hide(self): # Optionally implemented in subclass
         return
+
+    def reg_task(self, task, on_change=False):  # May be passed a coro or a Task
+        if isinstance(task, type_coro):
+            task = asyncio.create_task(task)
+        self.tasklist.append([task, on_change])
 
     async def _garbage_collect(self):
         while True:
@@ -685,7 +708,7 @@ class Touchable(NoTouch):
         y0 = self.location[1]
         y1 = self.location[1] + self.height
         if x0 <= x <= x1 and y0 <= y <= y1:
-            self.was_touched = True
+            self.was_touched = True  # Cleared by Screen._touchtest
             if not self.busy or self.can_drag:
                 self._touched(x, y) # Called repeatedly for draggable objects
                 self.busy = True # otherwise once only

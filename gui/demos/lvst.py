@@ -49,8 +49,7 @@ class VerticalSliderScreen(Screen):
                              value=0.5, border = 2)
         self.slave = Slider((60, 5), fgcolor = GREEN, cbe_args = ('Slave',),
                             cb_move = self.slave_moved, border = 2)
-        loop = asyncio.get_event_loop()
-        loop.create_task(self.coro())
+        self.reg_task(self.coro())
     # On/Off toggle: enable/disable quit button and one slider
         bs = ButtonList(self.cb_en_dis)
         lst_en_dis = [self.slave, self.master]
