@@ -1,11 +1,11 @@
 # vtest.py Test/demo of VectorDial
 
 # Released under the MIT License (MIT). See LICENSE.
-# Copyright (c) 2019 Peter Hinch
+# Copyright (c) 2019-2020 Peter Hinch
 
 # Updated for uasyncio V3
 
-import urandom
+import os
 import time
 from cmath import rect, pi
 import uasyncio as asyncio
@@ -51,7 +51,7 @@ async def ptr_test(dial):
     ptr = Pointer(dial)
     v = 0j
     steps = 20  # No. of interpolation steps
-    grv = lambda : urandom.getrandbits(16) / 2**15 - 1  # Random: range -1.0 to +1.0
+    grv = lambda: (int.from_bytes(os.urandom(1), 1) -128) / 128  # Random: range -1.0 to +1.0
     while True:
         v1 = grv() + 1j * grv()  # Random vector
         dv = (v1 - v) / steps  # Interpolation vector
