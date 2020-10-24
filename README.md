@@ -94,7 +94,8 @@ The Plot module: Cartesian and polar graphs.
 8. [Fonts](./README.md#8-fonts)  
   8.1 [External fonts](./README.md#81-external-fonts)  
   8.2 [Internal fonts: Class IFont](./README.md#82-internal-fonts-class-ifont)  
-9. [Issues](./README.md#9-issues) A problem encountered with old firmware  
+9. [Issues](./README.md#9-issues) A problem encountered with old LCD160CR firmware  
+10. [Application design note](./README.md#10-Application design note) Touch application design  
 
 # 1. Pre requisites
 
@@ -419,13 +420,13 @@ These do nothing, and may be defined in subclasses if required.
 
 ## 4.4 Method
 
- * `reg_task` args `task`, `on_change=False`. The first arg may be a `Task`
- instance or a coroutine. It is a convenience method which provides for the
- automatic cancellation of tasks. If a screen runs independent coros it can opt
- to register these. On shudown, any registered tasks of the base screen are
- cancelled. On screen change, registered tasks with `on_change` `True` are
- cancelled. For finer control applications can ignore this method and handle
- cancellation explicitly in code.
+ * `reg_task` args `task`, `on_change=False`. This is a convenience method for
+ applications which use `uasyncio` and provides for the automatic cancellation
+ of tasks. The first arg may be a `Task` instance or a coroutine. If a `Screen`
+ runs associated coros it can opt to register these. On shudown, any registered
+ tasks of the base screen are cancelled. On screen change, registered tasks
+ with `on_change` `True` are cancelled. For finer control applications can
+ ignore this method and handle cancellation explicitly in code.
 
 ###### [Jump to Contents](./README.md#contents)
 
@@ -736,7 +737,9 @@ Optional keyword only arguments:
  * `callback` Callback function which runs when button is pressed.
  * `args` A list/tuple of arguments for the above callback. Default `[]`.
  * `onrelease` Default `True`. If `True` the callback will occur when the
- button is released otherwise it will occur when pressed. See note below.
+ button is released otherwise it will occur when pressed. See
+ [Application design note](./README.md#10-Application design note) for the
+ reason for this default.
  * `lp_callback` Callback to be used if button is to respond to a long press.
  Default `None`.
  * `lp_args` A list/tuple of arguments for above callback. Default `[]`.
@@ -749,10 +752,6 @@ Method:
 Class variables:
  * `lit_time` Period in seconds the `litcolor` is displayed. Default 1.
  * `long_press_time` Press duration for a long press. Default 1 second.
-
-Note: if button callbacks change screens, `onrelease` should be set `False`.
-This avoids multiple screen changes if more than one such button is pressed
-simultaneously.
 
 ###### [Jump to Contents](./README.md#contents)
 
@@ -1061,3 +1060,20 @@ Optional args:
 There was a problem with detection of long button presses (MicroPython issue
 #2879). This was resolved in early 2017 by an upgrade to the LCD160CR firmware.
 If running an old display device you may need to request an upgrade.
+
+# 10. Application design note
+
+There is an issue in a touch application where a control causes a new screen
+to overlay the current screen, or closes a screen to reveal the one below.
+Consider a `X` screen close button at the top right hand corner of each screen.
+If touched, the screen closes revealing the one below with its `X` button: the
+touch causes this immediately to be activated closing that screen too.
+
+For this reason the [Button class](./README.md#64-class-button) defaults to
+running the callback on release. While this fixes the problem of close buttons,
+it can introduce problems where buttons open screens: if multiple buttons are
+pressed at once, unexpected screen changes can occur. Either set such buttons
+to run the callback on press or use a control such as a listbox.
+
+The general point, where screens change, is to consider how continuing touch
+will affect the new screen.
