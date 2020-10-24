@@ -95,7 +95,7 @@ The Plot module: Cartesian and polar graphs.
   8.1 [External fonts](./README.md#81-external-fonts)  
   8.2 [Internal fonts: Class IFont](./README.md#82-internal-fonts-class-ifont)  
 9. [Issues](./README.md#9-issues) A problem encountered with old LCD160CR firmware  
-10. [Application design note](./README.md#10-Application design note) Touch application design  
+10. [Application design note](./README.md#10-application-design-note) Touch application design  
 
 # 1. Pre requisites
 
@@ -738,7 +738,7 @@ Optional keyword only arguments:
  * `args` A list/tuple of arguments for the above callback. Default `[]`.
  * `onrelease` Default `True`. If `True` the callback will occur when the
  button is released otherwise it will occur when pressed. See
- [Application design note](./README.md#10-Application design note) for the
+ [Application design note](./README.md#10-application-design-note) for the
  reason for this default.
  * `lp_callback` Callback to be used if button is to respond to a long press.
  Default `None`.
