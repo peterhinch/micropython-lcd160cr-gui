@@ -19,7 +19,7 @@ class Pad(Touchable):
     def __init__(self, location, *, height=20, width=50, onrelease=True,
                  callback=None, args=[], lp_callback=None, lp_args=[]):
         super().__init__(location, None, height, width, None, None, None, None, False, '', None)
-        self.callback = callback
+        self.callback = (lambda *_: None) if callback is None else callback
         self.callback_args = args
         self.onrelease = onrelease
         self.lp_callback = lp_callback
@@ -32,14 +32,14 @@ class Pad(Touchable):
     def _touched(self, x, y):  # Process touch
         if self.lp_callback is not None:
             self.lp_task = asyncio.create_task(self.longpress())
-        if not self.onrelease and self.callback is not None:
+        if not self.onrelease:
             self.callback(self, *self.callback_args) # Callback not a bound method so pass self
 
     def _untouched(self):
         if self.lp_task is not None:
             self.lp_task.cancel()
             self.lp_task = None
-        if self.onrelease and self.callback is not None:
+        if self.onrelease:
             self.callback(self, *self.callback_args) # Callback not a bound method so pass self
 
     async def longpress(self):
