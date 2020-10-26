@@ -11,6 +11,7 @@ from gui.core.lcd160_gui import Screen
 import font10
 from gui.widgets.buttons import Button, ButtonList, RadioButtons
 from gui.widgets.label import Label
+from gui.widgets.pad import Pad
 from gui.widgets.dropdown import Dropdown
 from gui.widgets.checkbox import Checkbox
 from lcd_local import setup
@@ -116,16 +117,20 @@ class HighlightScreen(Screen):
         ]
         Label((0, 0), font = font10, value = 'Highlight Buttons')
 # Highlighting buttons
+        lbl_result = Label((0, 106), **labels)
+        def cbbtn(button, arg):
+            lbl_result.value(arg)
         x = 0
         for t in table:
             Button((x, 30), shape = CIRCLE, fgcolor = GREY, fontcolor = BLACK, litcolor = WHITE,
-                font = font10, callback = self.callback, height = 30, **t)
+                   font = font10, callback = cbbtn, height = 30, **t)
             x += 43
-        self.lbl_result = Label((0, 106), **labels)
+        lbl_pad = Label((0, 76), value = 'touch me', fontcolor = WHITE, border = 2,
+                        fgcolor = RED, bgcolor = DARKGREEN, font = font10)
+        pad = Pad((0, 76), width = lbl_pad.width, onrelease = False,
+                  callback = lambda _: lbl_pad.value('Short'),
+                  lp_callback = lambda _: lbl_pad.value('Long'))
         backbutton()
-
-    def callback(self, button, arg):
-        self.lbl_result.value(arg)
 
 # **** ASSORTED SCREEN ****
 
@@ -221,7 +226,7 @@ class BaseScreen(Screen):
         y = 0
         for t in table_highlight:
             rb.add_button((0, y), font = font10, fgcolor = DARKBLUE,
-                          onrelease=False, width = 80, fontcolor = WHITE, **t)
+                          onrelease = False, width = 80, fontcolor = WHITE, **t)
             y += 25
 # Enable/Disable toggle 
         self.bs_en = ButtonList(self.cb_en_dis)
