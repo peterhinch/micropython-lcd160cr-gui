@@ -33,7 +33,7 @@ class Button(Touchable):
         self.onrelease = onrelease
         self.lp_callback = lp_callback
         self.lp_args = lp_args
-        self.lp = False # Long press not in progress
+        self.lp_task = None # Long press not in progress
         self.orig_fgcolor = fgcolor
         if self.litcolor is not None:
             self.delay = Delay_ms(self.shownormal)
@@ -88,20 +88,20 @@ class Button(Touchable):
             self.show() # must be on current screen
             self.delay.trigger(Button.lit_time)
         if self.lp_callback is not None:
-            asyncio.create_task(self.longpress())
+            self.lp_task = asyncio.create_task(self.longpress())
         if not self.onrelease:
             self.callback(self, *self.callback_args) # Callback not a bound method so pass self
 
     def _untouched(self):
-        self.lp = False
+        if self.lp_task is not None:
+            self.lp_task.cancel()
+            self.lp_task = None
         if self.onrelease:
             self.callback(self, *self.callback_args) # Callback not a bound method so pass self
 
     async def longpress(self):
-        self.lp = True
-        await asyncio.sleep_ms(self.long_press_time)
-        if self.lp:
-            self.lp_callback(self, *self.lp_args)
+        await asyncio.sleep_ms(Button.long_press_time)
+        self.lp_callback(self, *self.lp_args)
 
 # Group of buttons, typically at same location, where pressing one shows
 # the next e.g. start/stop toggle or sequential select from short list

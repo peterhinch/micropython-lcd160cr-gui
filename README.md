@@ -872,6 +872,9 @@ Optional keyword only arguments:
  * `args` A list/tuple of arguments for above callback. Default `[]`.
 
 Methods:
+ * `greyed_out` Optional boolean argument `val` default `None`. If
+ `None` returns the current 'greyed out' status of the control. Otherwise
+ enables or disables it, showing it in its new state.
  * `value` Argument `val` default `None`. If the argument is provided
  which is a valid index into the list that entry becomes current and the
  callback is executed. Always returns the index of the currently active entry.
@@ -914,6 +917,9 @@ Optional keyword only arguments:
  * `args` A list/tuple of arguments for above callback. Default `[]`.
 
 Methods:
+ * `greyed_out` Optional boolean argument `val` default `None`. If
+ `None` returns the current 'greyed out' status of the control. Otherwise
+ enables or disables it, showing it in its new state.
  * `value` Argument `val` default `None`. If the argument is provided
  which is a valid index into the list that entry becomes current and the
  callback is executed. Always returns the index of the currently active entry.
@@ -947,6 +953,11 @@ Optional keyword only arguments:
  * `lp_callback=None` Callback to be used if button is to respond to a long
  press.
  * `lp_args=[]` A list/tuple of arguments for above callback.
+
+Method:
+ * `greyed_out` Optional boolean argument `val` default `None`. If
+ `None` returns the current 'greyed out' status of the control. Otherwise
+ enables or disables it - there is no visible effect.
 
 ###### [Jump to Contents](./README.md#contents)
 
