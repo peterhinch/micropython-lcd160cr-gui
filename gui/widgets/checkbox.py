@@ -4,7 +4,7 @@
 # Copyright (c) 2020 Peter Hinch
 
 # Usage:
-# from widgets.checkbox import Checkbox
+# from gui.widgets.checkbox import Checkbox
 
 from gui.core.lcd160_gui import Touchable, dolittle
 

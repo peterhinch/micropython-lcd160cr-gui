@@ -4,7 +4,7 @@
 # Copyright (c) 2020 Peter Hinch
 
 # Usage:
-# from widgets.label import Label
+# from gui.widgets.label import Label
 
 from gui.core.lcd160_gui import NoTouch, get_stringsize, print_left
 from gui.core.constants import * 

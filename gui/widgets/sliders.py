@@ -4,9 +4,9 @@
 # Copyright (c) 2020 Peter Hinch
 
 # Usage:
-# from widgets.sliders import Slider
+# from gui.widgets.sliders import Slider
 # or:
-# from widgets.sliders import HorizSlider
+# from gui.widgets.sliders import HorizSlider
 
 from gui.core.lcd160_gui import Touchable, get_stringsize, dolittle
 from gui.widgets.label import Label

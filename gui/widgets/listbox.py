@@ -4,7 +4,7 @@
 # Copyright (c) 2020 Peter Hinch
 
 # Usage:
-# from widgets.listbox import Listbox
+# from gui.widgets.listbox import Listbox
 
 from gui.core.lcd160_gui import Touchable, print_left, dolittle
 from gui.core.constants import *

@@ -10,7 +10,6 @@ from math import pi
 
 from gui.core.constants import *
 from gui.core.lcd160_gui import Screen
-import font6
 import font10
 from gui.widgets.knob import Knob
 from gui.widgets.dial import Dial

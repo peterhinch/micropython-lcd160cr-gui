@@ -1,5 +1,6 @@
 # A touch GUI for the official MicroPython display
 
+v0.21 29th Oct 2020 Add `Scale` and `Pad` widgets.
 V0.20 21st Oct 2020 Refactor as a Python package. The refactor is a breaking
 change: applications must adapt `import` statements. There is now no need to
 cross compile on a Pyboard 1.1. Unused widgets no longer consume RAM. The
@@ -74,11 +75,12 @@ The Plot module: Cartesian and polar graphs.
   4.3 [Callback methods](./README.md#43-callback-methods)  
   4.4 [Method](./README.md#44-method)  
 5. [Display Classes](./README.md#5-display-classes)  
-  5.1 [Class Label](./README.md#51-class-label)  
-  5.2 [Class Dial](./README.md#52-class-dial)  
-  5.3 [Class LED](./README.md#53-class-led)  
-  5.4 [Class Meter](./README.md#54-class-meter)  
-  5.5 [Vector display](./README.md#55-vector-display)  
+  5.1 [Class Label](./README.md#51-class-label) Display static or dynamic text.  
+  5.2 [Class Dial](./README.md#52-class-dial) Rotary display of variables.  
+  5.3 [Class LED](./README.md#53-class-led) On/off display.  
+  5.4 [Class Meter](./README.md#54-class-meter) Linear "panel meter" device.  
+  5.5 [Vector display](./README.md#55-vector-display) Compass and clock style display of multiple vectors.  
+  5.6 [5.6 Scale class](./README.md#56-scale-class) Linear display with wide dynamic range.  
 6. [Control Classes](./README.md#6-control-classes)  
   6.1 [Class Button](./README.md#61-class-button)  
   6.2 [Class ButtonList: emulate a button with multiple states](./README.md#62-class-buttonlist-emulate-a-button-with-multiple-states)  
@@ -187,6 +189,8 @@ Test/demo programs in `demos` subdirectory:
  8. `lpt.py` Demo of plot module.
  9. `lptg.py` Plot with `TSequence` simulated real time data acquisition.
  10. `vtest.py` Test of vector display.
+ 11. `lscale.py` Demo of `Scale` object. This is capable of displaying floats
+ to a high degree of accuracy.
 
 Synchronisation primitives in `primitives` subdirectory.  
 Widgets in `widgets` subdirectory.
@@ -583,6 +587,54 @@ Method:
  is passed as the value `v` it is scaled to ensure its magnitude is <= 1 and
  the pointer is redrawn. If a color is passed as `col` the pointer's color is
  updated.
+
+## 5.6 Scale class
+
+This displays floating point data having a wide dynamic range. It is modelled
+on old radios where a large scale scrolls past a small window having a fixed
+pointer. This enables a scale with (say) 2000 divisions to be readily visible
+on a small display, where users can interpolate between individual divisions.
+
+Legends for the scale are created dynamically as it scrolls past the window.
+The user may control this by means of a callback. The example `lscale.py`
+illustrates a variable with range 88.0 to 108.0, the callback ensuring that the
+display legends match the user variable.
+
+The scale displays floats in range -1.0 <= V <= 1.0.
+
+Constructor mandatory positional arguments:
+ 1. `location` 2-tuple defining position.
+ 2. `font` Font for labels.
+
+Keyword only arguments (all optional): 
+ * `divs=2000` Number of "tick" divisions on scale. Must be divisible by 20.
+ * `legendcb=None` Callback for populating scale legends (see below).
+ * `height=0` Default is a minimum height based on the font height.
+ * `width=100`
+ * `border=2` Border width in pixels.
+ * `fgcolor=None` Foreground color. Defaults to system color.
+ * `bgcolor=None` Background color of object. Defaults to system background.
+ * `pointercolor=None` Color of pointer. Defaults to `.fgcolor`.
+ * `fontcolor=None` Color of legends. Default `WHITE`.
+ * `value=None` Initial value. Default
+
+Method:
+ * `value=None` Set or get the current value. Always returns the current value.
+ If a float is passed, it is constrained to the range -1.0 <= V <= 1.0 and
+ becomes the `Scale`'s current value. The `Scale` is updated.
+
+The display window contains 20 ticks comprising two divisions; by default a
+division covers a range of 0.1. A division has a legend at the start and end
+whose text is defined by the `legendcb` callback. If no user callback is
+supplied, legends will be of the form `0.3`, `0.4` etc. User code may override
+these to cope with cases where a user variable is mapped onto the control's
+range. The callback takes a single `float` arg which is the value to be shown.
+It must return a text string. An example from the demo program shows FM radio
+frequencies:
+```python
+def legendcb(f):
+    return '{:2.0f}'.format(88 + ((f + 1) / 2) * (108 - 88))
+```
 
 # 6. Control Classes
 

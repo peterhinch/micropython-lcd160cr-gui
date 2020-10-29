@@ -4,7 +4,7 @@
 # Copyright (c) 2020 Peter Hinch
 
 # Usage:
-# from widgets.dial import Dial
+# from gui.widgets.dial import Dial
 
 import math
 from gui.core.lcd160_gui import NoTouch

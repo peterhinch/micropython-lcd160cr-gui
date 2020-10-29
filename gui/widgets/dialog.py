@@ -9,7 +9,7 @@ from gui.widgets.buttons import Button
 from gui.core.constants import * 
 
 # Usage:
-# from widgets.dialog import DialogBox
+# from gui.widgets.dialog import DialogBox
 
 # *********** DIALOG BOX CLASS ***********
 # Enables parameterised creation of button-based dialog boxes. See ldb.py

@@ -3,6 +3,9 @@
 # Released under the MIT License (MIT). See LICENSE.
 # Copyright (c) 2019-2020 Peter Hinch
 
+# Usage:
+# from gui.widgets.vectors import Pointer, VectorDial
+
 import cmath
 from gui.core.lcd160_gui import Screen, NoTouch
 from gui.core.constants import *

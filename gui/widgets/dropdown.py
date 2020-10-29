@@ -4,7 +4,7 @@
 # Copyright (c) 2020 Peter Hinch
 
 # Usage:
-# from widgets.dropdown import Dropdown
+# from gui.widgets.dropdown import Dropdown
 
 from gui.core.lcd160_gui import Touchable, Aperture, Screen, print_left, dolittle
 from gui.core.constants import *

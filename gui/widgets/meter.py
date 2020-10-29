@@ -4,7 +4,7 @@
 # Copyright (c) 2020 Peter Hinch
 
 # Usage:
-# from widgets.meter import Meter
+# from gui.widgets.meter import Meter
 
 from gui.core.lcd160_gui import NoTouch, print_centered
 from gui.core.constants import * 

@@ -4,7 +4,7 @@
 # Copyright (c) 2020 Peter Hinch
 
 # Usage:
-# from widgets.led import LED
+# from gui.widgets.led import LED
 
 from gui.core.lcd160_gui import NoTouch
 from gui.core.constants import * 

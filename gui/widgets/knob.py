@@ -4,7 +4,7 @@
 # Copyright (c) 2020 Peter Hinch
 
 # Usage:
-# from widgets.knob import Knob
+# from gui.widgets.knob import Knob
 
 import math
 from gui.core.lcd160_gui import Touchable, dolittle
