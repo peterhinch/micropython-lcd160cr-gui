@@ -80,7 +80,7 @@ The Plot module: Cartesian and polar graphs.
   5.3 [Class LED](./README.md#53-class-led) On/off display.  
   5.4 [Class Meter](./README.md#54-class-meter) Linear "panel meter" device.  
   5.5 [Vector display](./README.md#55-vector-display) Compass and clock style display of multiple vectors.  
-  5.6 [5.6 Scale class](./README.md#56-scale-class) Linear display with wide dynamic range.  
+  5.6 [Scale class](./README.md#56-scale-class) Linear display with wide dynamic range.  
 6. [Control Classes](./README.md#6-control-classes)  
   6.1 [Class Button](./README.md#61-class-button)  
   6.2 [Class ButtonList: emulate a button with multiple states](./README.md#62-class-buttonlist-emulate-a-button-with-multiple-states)  
@@ -587,6 +587,8 @@ Method:
  is passed as the value `v` it is scaled to ensure its magnitude is <= 1 and
  the pointer is redrawn. If a color is passed as `col` the pointer's color is
  updated.
+ 
+ ###### [Jump to Contents](./README.md#contents)
 
 ## 5.6 Scale class
 
@@ -635,6 +637,8 @@ frequencies:
 def legendcb(f):
     return '{:2.0f}'.format(88 + ((f + 1) / 2) * (108 - 88))
 ```
+
+###### [Jump to Contents](./README.md#contents)
 
 # 6. Control Classes
 
