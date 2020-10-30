@@ -592,6 +592,8 @@ Method:
 
 ## 5.6 Scale class
 
+Please note this is **under development**. The API for this widget may change.
+
 This displays floating point data having a wide dynamic range. It is modelled
 on old radios where a large scale scrolls past a small window having a fixed
 pointer. This enables a scale with (say) 2000 divisions to be readily visible
