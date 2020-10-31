@@ -596,13 +596,16 @@ Please note this is **under development**. The API for this widget may change.
 
 This displays floating point data having a wide dynamic range. It is modelled
 on old radios where a large scale scrolls past a small window having a fixed
-pointer. This enables a scale with (say) 2000 divisions to be readily visible
-on a small display, where users can interpolate between individual divisions.
+pointer. This enables a scale with (say) 200 graduations (ticks) to readily be
+visible on a small display, with sufficient resolution to enable the user to
+interpolate between ticks. Default settings enable estimation of a value to
+within +-0.1%.
 
 Legends for the scale are created dynamically as it scrolls past the window.
 The user may control this by means of a callback. The example `lscale.py`
 illustrates a variable with range 88.0 to 108.0, the callback ensuring that the
-display legends match the user variable.
+display legends match the user variable. A further callback enables the scale's
+color to change over its length or in response to other circumstances.
 
 The scale displays floats in range -1.0 <= V <= 1.0.
 
@@ -611,8 +614,9 @@ Constructor mandatory positional arguments:
  2. `font` Font for labels.
 
 Keyword only arguments (all optional): 
- * `divs=2000` Number of "tick" divisions on scale. Must be divisible by 20.
+ * `ticks=200` Number of "tick" divisions on scale. Must be divisible by 2.
  * `legendcb=None` Callback for populating scale legends (see below).
+ * `tickcb=None` Callback for setting tick colors (see below).
  * `height=0` Default is a minimum height based on the font height.
  * `width=100`
  * `border=2` Border width in pixels.
@@ -620,24 +624,43 @@ Keyword only arguments (all optional):
  * `bgcolor=None` Background color of object. Defaults to system background.
  * `pointercolor=None` Color of pointer. Defaults to `.fgcolor`.
  * `fontcolor=None` Color of legends. Default `WHITE`.
- * `value=None` Initial value. Default
+ * `value=0.0` Initial value.
 
 Method:
  * `value=None` Set or get the current value. Always returns the current value.
- If a float is passed, it is constrained to the range -1.0 <= V <= 1.0 and
- becomes the `Scale`'s current value. The `Scale` is updated.
+ A passed `float` is constrained to the range -1.0 <= V <= 1.0 and becomes the
+ `Scale`'s current value. The `Scale` is updated.
+
+### legendcb
 
 The display window contains 20 ticks comprising two divisions; by default a
 division covers a range of 0.1. A division has a legend at the start and end
 whose text is defined by the `legendcb` callback. If no user callback is
 supplied, legends will be of the form `0.3`, `0.4` etc. User code may override
 these to cope with cases where a user variable is mapped onto the control's
-range. The callback takes a single `float` arg which is the value to be shown.
-It must return a text string. An example from the demo program shows FM radio
-frequencies:
+range. The callback takes a single `float` arg which is the value of the tick
+(in range -1.0 <= v <= 1.0). It must return a text string. An example from the
+`lscale.py` demo shows FM radio frequencies:
 ```python
 def legendcb(f):
     return '{:2.0f}'.format(88 + ((f + 1) / 2) * (108 - 88))
+```
+The arithmetic can be simplified: written this way to show the logic.
+
+### tickcb
+
+This callback enables the tick color to be changed dynamically. For example a
+scale might change from green to orange, then to red as it nears the extremes.
+The callback takes two args, being the value of the tick (in range 
+-1.0 <= v <= 1.0) and the default color. It must return a color. This example
+is taken from the `lscale.py` demo:
+```python
+def tickcb(f, c):
+    if f > 0.8:
+        return RED
+    if f < -0.8:
+        return BLUE
+    return c
 ```
 
 ###### [Jump to Contents](./README.md#contents)
