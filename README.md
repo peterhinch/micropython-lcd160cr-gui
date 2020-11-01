@@ -39,9 +39,19 @@ Highlight buttons change color for a period after touching.
 Slider controls allow control and display of float values. Also Meter, LED
 and Dial displays.   
 
+![Image](images/IMG_3250)__
+The `Slide` control can accurately display variables having a wide range of
+values. The scale moves within a window so that the current value aligns with
+the fixed pointer. The scale color can change dynamically (in the lower
+instance).
+
 ![Image](images/IMG_2513.JPG)  
 Rotary controls and displays - `lkt.py` demonstrates the two styles of
 "greying out" disabled controls.  
+
+![Image](images/IMG_3251) ![Image](images/IMG_3252)  
+Vector displays. These can display an arbitrary number of vectors in "clock" or
+"compass" formats. Angle, length and color can change dynamically.
 
 ![Image](images/IMG_2511.JPG) ![Image](images/IMG_2512.JPG)  
 Listbox and dropdown list objects (image on right shows dropdown opened).  
