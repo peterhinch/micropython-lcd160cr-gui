@@ -39,7 +39,7 @@ Highlight buttons change color for a period after touching.
 Slider controls allow control and display of float values. Also Meter, LED
 and Dial displays.   
 
-![Image](images/IMG_3250.JPG)__
+![Image](images/IMG_3250.JPG)  
 The `Slide` control can accurately display variables having a wide range of
 values. The scale moves within a window so that the current value aligns with
 the fixed pointer. The scale color can change dynamically (in the lower
