@@ -629,9 +629,10 @@ Keyword only arguments (all optional):
 Method:
  * `value=None` Set or get the current value. Always returns the current value.
  A passed `float` is constrained to the range -1.0 <= V <= 1.0 and becomes the
- `Scale`'s current value. The `Scale` is updated.
+ `Scale`'s current value. The `Scale` is updated. Passing `None` enables
+ reading the current value.
 
-### legendcb
+### Callback legendcb
 
 The display window contains 20 ticks comprising two divisions; by default a
 division covers a range of 0.1. A division has a legend at the start and end
@@ -645,9 +646,9 @@ range. The callback takes a single `float` arg which is the value of the tick
 def legendcb(f):
     return '{:2.0f}'.format(88 + ((f + 1) / 2) * (108 - 88))
 ```
-The arithmetic can be simplified: written this way to show the logic.
+The above arithmetic aims to show the logic. It can be simplified.
 
-### tickcb
+### Callback tickcb
 
 This callback enables the tick color to be changed dynamically. For example a
 scale might change from green to orange, then to red as it nears the extremes.

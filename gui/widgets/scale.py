@@ -4,7 +4,7 @@
 # Copyright (c) 2020 Peter Hinch
 
 # Usage:
-# from widgets.scale import Scale
+# from gui.widgets.scale import Scale
 
 from gui.core.lcd160_gui import NoTouch, print_left, get_stringsize
 from gui.core.constants import * 
@@ -26,9 +26,9 @@ class Scale(NoTouch):
         ctrl_ht = 12  # Minimum height for ticks
         min_ht = text_ht + 2 * border + 2  # Ht of text, borders and gap between text and ticks
         if height < min_ht + ctrl_ht:
-            height = min_ht + ctrl_ht
+            height = min_ht + ctrl_ht  # min workable height
         else:
-            ctrl_ht = height - min_ht
+            ctrl_ht = height - min_ht  # adjust ticks for greater height
         width &= 0xfffe  # Make divisible by 2: avoid 1 pixel pointer offset
         NoTouch.__init__(self, location, font, height, width,
                          fgcolor, bgcolor, fontcolor, border,
@@ -38,7 +38,7 @@ class Scale(NoTouch):
         self.x1 = self.location[0] + self.width - border
         self.y0 = self.location[1] + border
         self.y1 = self.location[1] + self.height - border
-        self.pointercolor = pointercolor if pointercolor is not None else self.fgcolor
+        self.ptrcolor = pointercolor if pointercolor is not None else self.fgcolor
         # Define tick dimensions
         ytop = self.y0 + text_ht + 2  # Top of scale graphic (2 pixel gap)
         ycl = ytop + (self.y1 - ytop) // 2  # Centre line
@@ -100,7 +100,7 @@ class Scale(NoTouch):
             fx += 10
             iv += 1
 
-        tft.draw_vline(x0 + (x1 - x0) // 2, y0, y1 - y0, self.pointercolor) # Draw pointer
+        tft.draw_vline(x0 + (x1 - x0) // 2, y0, y1 - y0, self.ptrcolor) # Draw pointer
 
     def _to_int(self, v):
         return round((v + 1.0) * self.ticks * 5)  # 0..self.ticks*10
