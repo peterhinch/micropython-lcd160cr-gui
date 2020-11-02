@@ -38,7 +38,6 @@ class BaseScreen(Screen):
             if f < -0.8:
                 return BLUE
             return c
-        #Label((0, 50), font = font6, value = 'Random:')
         self.lbl_result = Label((0, 105), font = font10, fontcolor = WHITE, width = 70,
                                 border = 2, fgcolor = RED, bgcolor = DARKGREEN)
         self.scale1 = Scale((0, 70), font6, width = 159, tickcb = tickcb,
