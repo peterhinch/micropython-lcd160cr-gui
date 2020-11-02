@@ -7,7 +7,6 @@
 # from gui.widgets.scale import Scale
 
 from gui.core.lcd160_gui import NoTouch, print_left, get_stringsize
-from gui.core.constants import * 
 
 class Scale(NoTouch):
     def __init__(self, location, font, *,
