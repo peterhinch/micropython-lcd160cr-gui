@@ -602,8 +602,6 @@ Method:
 
 ## 5.6 Scale class
 
-Please note this is **under development**. The API for this widget may change.
-
 This displays floating point data having a wide dynamic range. It is modelled
 on old radios where a large scale scrolls past a small window having a fixed
 pointer. This enables a scale with (say) 200 graduations (ticks) to readily be
@@ -673,6 +671,16 @@ def tickcb(f, c):
         return BLUE
     return c
 ```
+
+### increasing the ticks value
+
+This increases the precision of the display.
+
+It does this by lengthening the scale while keeping the window the same size,
+with 20 ticks displayed. If the scale becomes 10x longer, the value diference
+between consecutive large ticks and legends is divided by 10. This means that
+the `tickcb` callback must return a string having an additional significant
+digit. If this is not done, consecutive legends will have the same value.
 
 ###### [Jump to Contents](./README.md#contents)
 
