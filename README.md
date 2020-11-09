@@ -1,19 +1,22 @@
 # A touch GUI for the official MicroPython display
 
-v0.21 29th Oct 2020 Add `Scale` and `Pad` widgets.
+v0.21 29th Oct 2020 Add `Scale` and `Pad` widgets.  
 V0.20 21st Oct 2020 Refactor as a Python package. The refactor is a breaking
 change: applications must adapt `import` statements. There is now no need to
 cross compile on a Pyboard 1.1. Unused widgets no longer consume RAM. The
-structure also facilitates adding new widgets.
-
-Supports Jim Mussared's fast text rendering.
-
+structure also facilitates adding new widgets. Supports Jim Mussared's fast
+text rendering.  
 V0.12 21st Sep 2020 Updated for (and requires) uasyncio V3.  
 
-Provides a simple touch driven event based GUI interface for the Pyboard when
-used with the official LCD160CR colour display. It is based on the official
-driver and uses `uasyncio` for scheduling. The V1.1 display enables a Pyboard D
-to be plugged in. The GUI has been tested in this configuration.
+Provides a simple touch driven event based GUI interface for the the official
+LCD160CR colour display. It is based on the official driver and uses `uasyncio`
+for scheduling. It has been tested on:
+ * Pyboard 1.0 and 1.1
+ * Pyboard D
+ * ESP32
+It should be easy to port to platforms having both I2C and SPI interfaces,
+given sufficient RAM. The V1.1 display enables a Pyboard D to be plugged in to
+the rear. The GUI has been tested in this configuration.
 
 It is targeted at hardware control and display applications. GUI objects are
 drawn using graphics primitives rather than by rendering bitmap images. This
@@ -68,7 +71,6 @@ The Plot module: Cartesian and polar graphs.
   1.1 [Pre installation](./README.md#11-pre-installation)  
   1.2 [Library Documentation](./README.md#12-library-documentation)  
   1.3 [Installation](./README.md#13-installation)  
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.3.1 [ESP32](./README.md#131-esp32)  
   1.4 [Dependencies and Python files](./README.md#14-dependencies-and-python-files)  
   1.5 [A performance boost](./README.md#15-a-performance-boost)  
 2. [Concepts](./README.md#2-concepts)  
@@ -109,6 +111,7 @@ The Plot module: Cartesian and polar graphs.
   8.2 [Internal fonts: Class IFont](./README.md#82-internal-fonts-class-ifont)  
 9. [Issues](./README.md#9-issues) A problem encountered with old LCD160CR firmware  
 10. [Application design note](./README.md#10-application-design-note) Touch application design  
+11. [ESP32](./README.md#11-esp32) Use with non-Pyboard targets  
 
 # 1. Pre requisites
 
@@ -154,15 +157,8 @@ directory containing `gui` with:
 > rsync gui /sd/gui
 ```
 
-### 1.3.1 ESP32
-
-The library can be installed on ESP32. The file `lcd_local_esp.py` should be
-copied to `/pyboard/lcd_local.py` after making any edits to support your
-physical connection and maximum font size.
-
-[Fast mode](./README.md#15-a-performance-boost) will fail because the example
-is compiled for STM architecture. Options are to recompile for `xtensawin` or
-to disable fast mode by deleting `gui/framebuf_utils/framebuf_utils.mpy`.
+For use with non-Pyboard targets, including ESP32, see 
+[ESP32](./README.md#11-esp32).
 
 ## 1.4 Dependencies and Python files
 
@@ -1214,3 +1210,73 @@ to run the callback on press or use a control such as a listbox.
 
 The general point, where screens change, is to consider how continuing touch
 will affect the new screen.
+
+# 11. ESP32
+
+The official display may be connected to non-Pyboard targets via I2C and SPI
+interfaces. Both interfaces are required. The display has an AP2210 LDO voltage
+regulator so it may be powered from 5V or 3.3V. Connections may be made via
+the downward facing pins or the black connector at the end of the PCB. In my
+testing the SPI connections on that connector did not work, however the power
+and I2C connections were OK.
+
+The downward facing pins are as follows. The table is arranged such that the
+black connector is at the top. The view is looking at the display surface.
+
+Pin names are those on a mating Pyboard 1.x. Only signals with an entry in the
+`Link` column require connection to the target.
+
+| Pin | Signal  | Link | Signal | Link | Pin |
+|:---:|:-------:|:----:|:------:|:----:|:---:|
+| Y1  | UART Rx |      | Vin    | 5V   | Vin |
+| Y2  | UART Tx |      | NC     |      | 3V3 |
+| Y3  | LCD CS1 |      | Gnd    | Gnd  | Gnd |
+| Y4  | LCD RST | PWR  | Rst    |      | Rst |
+| Y5  | SS\     |      | LCD BL |      | Y12 |
+| Y6  | SCK     | SPI  | T-IRQ  |      | Y11 |
+| Y7  | MISO    |      | SDA    | I2C  | Y10 |
+| Y8  | MOSI    | SPI  | SCL    | I2C  | Y9  |
+
+The `PWR` signal enables power to the display and should be assigned to an
+arbitrary I/O pin. The display board has no I2C pullups. If the target does not
+have them, pullups to 3.3V on `SDA` and `SCL` are essential. Values are not
+critical - 1.5KΩ to 4.7KΩ are typical.
+
+This code from `lcd_local_esp.py` works on the reference board:
+```python
+from gui.core import lcd160cr
+from gui.core.lcd160_gui import Screen, LCD160CR_G
+
+from machine import Pin, I2C, SPI
+
+def setup():
+    pwr = Pin(25, Pin.OUT)
+    # Hardware SPI on native pins for performance
+    spi = SPI(1, 10_000_000, sck=Pin(14), mosi=Pin(13), miso=Pin(12))
+    i2c = I2C(1, scl=Pin(32), sda=Pin(33), freq=1_000_000)
+    lcd = LCD160CR_G(pwr=pwr, spi=spi, i2c=i2c)  # Set connection
+    lcd.set_orient(lcd160cr.LANDSCAPE)  # and orientation
+    Screen.setup(lcd)
+```
+I experienced problems specifying different pins for I2C. The
+[manual](http://docs.micropython.org/en/latest/esp32/quickref.html#hardware-i2c-bus)
+indicates that pins 18 and 19 can be used, but I experienced timeout errors
+with these pins.
+
+To install the library on ESP32 the file `lcd_local_esp.py` should be copied to
+`/pyboard/lcd_local.py` after making any edits to support your physical
+connection and maximum font size.
+
+The supplied [framebuf_utils.mpy](./README.md#15-a-performance-boost) will
+produce a harmless warning message because the supplied example is compiled for
+STM architecture. To enable fast text rendering it is necessary to recompile
+for `xtensawin`.
+
+### Debug notes
+
+If changing the pins or migrating to a different target the following errors
+can occur.
+ * ENOENT or timeout exception: I2C problem. Check pullups.
+ * Blank display: check the pwr pin.
+ * The GUI works but lacks text on buttons. Meters and sliders show
+ corruption: this is an SPI problem.

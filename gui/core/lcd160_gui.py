@@ -5,12 +5,16 @@
 
 import framebuf
 from uctypes import bytearray_at, addressof
+fast_mode = False
 try:
     from gui.framebuf_utils.framebuf_utils import render
     fast_mode = True
     print('Using fast mode')
+except ValueError:
+    print('Ignoring framebuf_utils.mpy: compiled for incorrect architecture.')
 except ImportError:
-    fast_mode = False
+    pass
+
 import uasyncio as asyncio
 import gc
 from gui.core.lcd160cr import LCD160CR

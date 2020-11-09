@@ -4,10 +4,10 @@
 # Released under the MIT License (MIT). See LICENSE.
 # Copyright (c) 2018-2020 Peter Hinch
 
-
-# Copy to lcd_local.py on the target
-
 # This file is intended for definition of the local hardware.
+
+# Copy to lcd_local.py on the target.
+# This file has been tested on the ESP32 reference board. 
 
 # Arguments for LCD160CR_G are as per official LCD160CR driver with the
 # addition of a 'bufsize' kwarg. If provided it should be equal to
@@ -21,8 +21,9 @@ from machine import Pin, I2C, SPI
 
 def setup():
     pwr = Pin(25, Pin.OUT)
-    spi = SPI(2, baudrate=8000000, sck=Pin(18), mosi=Pin(23))
-    i2c = i2c = I2C(-1, scl=Pin(32), sda=Pin(33))
+    # Hardware SPI on native pins for performance
+    spi = SPI(1, 10_000_000, sck=Pin(14), mosi=Pin(13), miso=Pin(12))
+    i2c = I2C(1, scl=Pin(32), sda=Pin(33), freq=1_000_000)
     lcd = LCD160CR_G(pwr=pwr, spi=spi, i2c=i2c)  # Set connection
     lcd.set_orient(lcd160cr.LANDSCAPE)  # and orientation
     Screen.setup(lcd)
