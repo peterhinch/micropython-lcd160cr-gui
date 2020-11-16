@@ -97,13 +97,17 @@ def print_centered(tft, x, y, s, style):
     tft.set_text_pos(x, y)
     tft.print_string(s)
 
-def print_left(tft, x, y, s, style):
+# Style is (fgcolor, bgcolor, font)
+# Rudimentary: prints a single line.
+def print_left(tft, x, y, s, style, tab=32):
+    if s == '':
+        return
     tft.text_style(style)
     tft.set_text_pos(x, y)
     font = style[2]
-    if isinstance(font, IFont):
+    if isinstance(font, IFont):  # Tabs unsupported for internal fonts
         return font.render(tft, x, y, s, style)
-    tft.print_string(s)
+    tft.print_string(s, tab=tab)
 
 # *********** LCD160CR_G CLASS ************
 
@@ -314,7 +318,7 @@ class LCD160CR_G(LCD160CR):
         self.text_x = 0
         self.text_y += rows
 
-    def print_char(self, c, wrap, fgcolor, bgcolor):
+    def print_char(self, c, wrap, fgcolor, bgcolor, tab=32):
 # get the character's pixel bitmap and dimensions
         if self.text_font:
             glyph, rows, cols = self.text_font.get_ch(c)
@@ -323,6 +327,11 @@ class LCD160CR_G(LCD160CR):
         if c == '\n':
             self._newline(rows)
             return 0
+        if c == '\t':
+            xs = self.text_x
+            self.text_x += tab - self.text_x % tab
+            return self.text_x - xs
+
 # test char fit
         if wrap:
             if self.text_x + cols >= self.w: # does the glyph fit on the screen?
@@ -349,12 +358,12 @@ class LCD160CR_G(LCD160CR):
         self.text_x += cols
         return cols
 
-    def print_string(self, s, wrap=False):
+    def print_string(self, s, wrap=False, tab=32):
         fgcolor = self.rgb(*self.text_fgc)
         bgcolor = self.rgb(*self.text_bgc)
         length = 0
         for c in s:
-            length += self.print_char(c, wrap, fgcolor, bgcolor)
+            length += self.print_char(c, wrap, fgcolor, bgcolor, tab)
         return length
 
 # Convenience methods to ease porting from TFT

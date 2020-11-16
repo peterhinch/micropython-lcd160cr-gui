@@ -103,6 +103,8 @@ The Plot module: Cartesian and polar graphs.
   6.7 [Class Listbox](./README.md#67-class-listbox)  
   6.8 [Class Dropdown](./README.md#68-class-dropdown)  
   6.9 [Class Pad](./README.md#69-class-pad) Invisible touch sensitive region.  
+  6.10 [Class Textbox](./README.md#610-class-textbox) Scrolling text display with tab support.  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.10.1 [Note on tabs](./README.md#6101-note-on-tabs)  
 7. [Dialog Boxes](./README.md#7-dialog-boxes)  
   7.1 [Class Aperture](./README.md#71-class-aperture)  
   7.2 [Class DialogBox](./README.md#72-class-dialogbox)  
@@ -199,6 +201,7 @@ Test/demo programs in `demos` subdirectory:
  10. `vtest.py` Test of vector display.
  11. `lscale.py` Demo of `Scale` object. This is capable of displaying floats
  to a high degree of accuracy.
+ 12. `tbox.py` Demo of `Textbox` class for scrolling text.
 
 Synchronisation primitives in `primitives` subdirectory.  
 Widgets in `widgets` subdirectory.
@@ -565,7 +568,7 @@ followed by a `Pointer` instance for each vector to be displayed on it. The
 By contrast with the `Dial` class the pointers have lengths and colors which
 can vary dynamically.
 ```python
-from micropython_ra8875.widgets.vectors import Pointer, VectorDial
+from gui.widgets.vectors import Pointer, VectorDial
 ```
 
 ### Class VectorDial
@@ -596,7 +599,7 @@ Method:
  the pointer is redrawn. If a color is passed as `col` the pointer's color is
  updated.
  
- ###### [Jump to Contents](./README.md#contents)
+###### [Jump to Contents](./README.md#contents)
 
 ## 5.6 Scale class
 
@@ -1030,6 +1033,8 @@ Methods:
 The callback is triggered if an item on the dropdown list is touched and that
 item is not currently selected (i.e. when a change occurs).
 
+###### [Jump to Contents](./README.md#contents)
+
 ## 6.9 Class Pad
 
 This rectangular touchable control is invisible. It can be used to enable
@@ -1056,6 +1061,70 @@ Method:
  * `greyed_out` Optional boolean argument `val` default `None`. If
  `None` returns the current 'greyed out' status of the control. Otherwise
  enables or disables it - there is no visible effect.
+
+###### [Jump to Contents](./README.md#contents)
+
+## 6.10 Class Textbox
+
+Displays multiple lines of text in a field of fixed dimensions. Text may be
+clipped to the width of the control or may be word-wrapped. If the number of
+lines of text exceeds the height available, scrolling may be performed, either
+by calling a method or by touching the control.
+
+Works with fixed and variable pitch fonts. Tab characters are supported for
+Python fonts (not for internal fonts): see [Note on tabs](./README.md#6101-note-on-tabs).
+```python
+from gui.widgets.textbox import Textbox
+```
+
+Constructor mandatory positional arguments:
+ 1. `location` 2-tuple defining position.
+ 2. `width` Width of the object in pixels.
+ 3. `nlines` Number of lines of text to display. The object's height is
+ determined from the height of the font:  
+ `height in pixels = nlines*font_height + 2*border`
+ 4. `font` Font to use. The internal font `IFont(3)` renders faster than the
+ Python fonts.
+
+Keyword only arguments:
+ * `border=2` Border width in pixels - typically 2. If `None`, no border will
+ be drawn.
+ * `fgcolor=None` Color of border. Defaults to system color.
+ * `bgcolor=None` Background color of object. Defaults to system background.
+ * `fontcolor=None` Text color. Defaults to system text color.
+ * `clip=True` By default lines too long to display are right clipped. If
+ `False` is passed, word-wrap is attempted. If the line contains no spaces
+ it will be wrapped at the right edge of the window.
+ * `repeat=True` Controls the behaviour of touch-based scrolling. By default
+ a long press causes repeated scrolling. `False` requires a discrete press for
+ each line movement.
+ * `tab=32` Tab space in pixels: see [Note on tabs](./README.md#6101-note-on-tabs).
+
+Methods:
+ * `append` Args `s, ntrim=None, line=None` Append the string `s` to the
+ display and scroll up as required to show it. By default only the number of
+ lines which will fit on screen are retained. If an integer `ntrim=N` is
+ passed, only the last N lines are retained. If an integer (typically 0) is
+ passed in `line` the display will scroll to show that line.
+ * `scroll` Arg `n` Number of lines to scroll. A negative number scrolls up. If
+ scrolling would achieve nothing because there are no extra lines to display,
+ nothing will happen.
+ * `value` No args. Returns the number of lines of text stored in the widget.
+ * `clear` No args. Clears all lines from the widget and refreshes the display.
+ * `goto` Arg `line=None` Fast scroll to a line. By default shows the end of
+ the text. 0 shows the start.
+
+Fast updates:  
+Rendering text to the screen is relatively slow. To send a large amount of text
+the fastest way is to perform a single `append`. Text may contain newline
+(`'\n'`) characters as required. In that way rendering occurs once only.
+
+### 6.10.1 Note on tabs
+
+The purpose of tab characters is to align columns of text whhen using variable
+pitch fonts. With fixed pitch fonts (such as internal fonts) they serve no
+purpose which cannot be achieved by the Python `format` command. Hence they are
+unsupported for internal fonts whose rendering prioritises speed.
 
 ###### [Jump to Contents](./README.md#contents)
 
