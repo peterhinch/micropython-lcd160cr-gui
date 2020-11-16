@@ -59,6 +59,10 @@ Vector displays. These can display an arbitrary number of vectors in "clock" or
 ![Image](images/IMG_2511.JPG) ![Image](images/IMG_2512.JPG)  
 Listbox and dropdown list objects (image on right shows dropdown opened).  
 
+![Image](images/textbox1.JPG) ![Image](images/textbox2.JPG)  
+The Textbox control displays scrolling text in a window. Supports tabs with
+variable pitch fonts. Text can be scrolled by touch or programmatically.
+
 ![Image](images/IMG_2509.JPG)  
 A modal dialog box.  
 
@@ -1068,8 +1072,9 @@ Method:
 
 Displays multiple lines of text in a field of fixed dimensions. Text may be
 clipped to the width of the control or may be word-wrapped. If the number of
-lines of text exceeds the height available, scrolling may be performed, either
-by calling a method or by touching the control.
+lines of text exceeds the height available, scrolling will occur. Access to
+text that has scrolled out of view may be achieved by touching the control or
+by calling a method.
 
 Works with fixed and variable pitch fonts. Tab characters are supported for
 Python fonts (not for internal fonts): see [Note on tabs](./README.md#6101-note-on-tabs).
@@ -1121,7 +1126,7 @@ the fastest way is to perform a single `append`. Text may contain newline
 
 ### 6.10.1 Note on tabs
 
-The purpose of tab characters is to align columns of text whhen using variable
+The purpose of tab characters is to align columns of text when using variable
 pitch fonts. With fixed pitch fonts (such as internal fonts) they serve no
 purpose which cannot be achieved by the Python `format` command. Hence they are
 unsupported for internal fonts whose rendering prioritises speed.
