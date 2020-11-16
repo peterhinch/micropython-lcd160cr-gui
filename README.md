@@ -61,7 +61,8 @@ Listbox and dropdown list objects (image on right shows dropdown opened).
 
 ![Image](images/textbox1.JPG) ![Image](images/textbox2.JPG)  
 The Textbox control displays scrolling text in a window. Supports tabs with
-variable pitch fonts. Text can be scrolled by touch or programmatically.
+variable pitch fonts. Text can be scrolled by touch or programmatically. Text
+may be clipped or word-wrapped.
 
 ![Image](images/IMG_2509.JPG)  
 A modal dialog box.  
