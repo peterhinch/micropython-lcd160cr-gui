@@ -1110,11 +1110,13 @@ Methods:
  * `append` Args `s, ntrim=None, line=None` Append the string `s` to the
  display and scroll up as required to show it. By default only the number of
  lines which will fit on screen are retained. If an integer `ntrim=N` is
- passed, only the last N lines are retained. If an integer (typically 0) is
- passed in `line` the display will scroll to show that line.
+ passed, only the last N lines are retained; `ntrim` may be greater than can be
+ shown in the control, hidden lines being accessed by scrolling.  
+ If an integer (typically 0) is passed in `line` the display will scroll to
+ show that line.
  * `scroll` Arg `n` Number of lines to scroll. A negative number scrolls up. If
  scrolling would achieve nothing because there are no extra lines to display,
- nothing will happen.
+ nothing will happen. Returns `True` if scrolling occurred, otherwise `False`.
  * `value` No args. Returns the number of lines of text stored in the widget.
  * `clear` No args. Clears all lines from the widget and refreshes the display.
  * `goto` Arg `line=None` Fast scroll to a line. By default shows the end of

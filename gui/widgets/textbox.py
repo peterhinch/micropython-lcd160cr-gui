@@ -98,11 +98,13 @@ class Textbox(Touchable):
     def scroll(self, n):  # Relative scrolling
         value = len(self.lines)
         if n == 0 or value <= self.nlines:
-            return
+            return False
         s = self.start
         self.start = max(0, min(self.start + n, value - self.nlines))
         if s != self.start:
             self.show_if_current()
+            return True
+        return False
 
     def _touched(self, x, y): # Was touched
         self.scroll(-1 if  2 * (y - self.location[1]) < self.height else 1)
