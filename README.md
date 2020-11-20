@@ -1127,6 +1127,11 @@ Rendering text to the screen is relatively slow. To send a large amount of text
 the fastest way is to perform a single `append`. Text may contain newline
 (`'\n'`) characters as required. In that way rendering occurs once only.
 
+`ntrim`__
+If text is regularly appended to a `Textbox` its buffer grows, using RAM. The
+value of `ntrim` sets a limit to the number of lines which are retained, with
+the oldest (topmost) being discarded as required.
+
 ### 6.10.1 Note on tabs
 
 The purpose of tab characters is to align columns of text when using variable

@@ -23,10 +23,8 @@ def setup():
     pwr = Pin(33, Pin.OUT)
     # Hardware SPI on native pins for performance
     spi = SPI(1, 10_000_000, sck=Pin(14), mosi=Pin(13), miso=Pin(12))
-    #i2c = I2C(1, scl=Pin(32), sda=Pin(33), freq=1_000_000)  # Works
-    # i2c = I2C(0) ENODEV
+    #i2c = I2C(1, scl=Pin(32), sda=Pin(33), freq=1_000_000)  # Alternative pins
     #i2c = I2C(0, scl=Pin(18), sda=Pin(19), freq=1_000_000)
-    #i2c = I2C(1) ENODEV
     i2c = I2C(1, scl=Pin(25), sda=Pin(26), freq=1_000_000)
     lcd = LCD160CR_G(pwr=pwr, spi=spi, i2c=i2c)  # Set connection
     lcd.set_orient(lcd160cr.LANDSCAPE)  # and orientation
