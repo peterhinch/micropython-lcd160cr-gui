@@ -1296,11 +1296,12 @@ will affect the new screen.
 # 11. ESP32
 
 The official display may be connected to non-Pyboard targets via I2C and SPI
-interfaces. Both interfaces are required. The display has an AP2210 LDO voltage
-regulator so it may be powered from 5V or 3.3V. Connections may be made via
-the downward facing pins or the black connector at the end of the PCB. In my
-testing the SPI connections on that connector did not work, however the power
-and I2C connections were OK.
+interfaces. Both interfaces are required by the GUI. The display has an AP2210
+LDO voltage regulator so it may be powered from 5V or 3.3V. Connections may be
+made via the downward facing pins or the black connector at the end of the PCB.
+In my testing the SPI connections on that connector
+[do not work](https://github.com/micropython/micropython/issues/6663), however
+the power and I2C connections were OK.
 
 The downward facing pins are as follows. The table is arranged such that the
 black connector is at the top. The view is looking at the display surface.
@@ -1313,52 +1314,96 @@ Pin names are those on a mating Pyboard 1.x. Only signals with an entry in the
 | Y1  | UART Rx |      | Vin    | 5V   | Vin |
 | Y2  | UART Tx |      | NC     |      | 3V3 |
 | Y3  | LCD CS1 |      | Gnd    | Gnd  | Gnd |
-| Y4  | LCD RST | PWR  | Rst    |      | Rst |
+| Y4  | PWR     | PWR  | Rst    |      | Rst |
 | Y5  | SS\     |      | LCD BL |      | Y12 |
 | Y6  | SCK     | SPI  | T-IRQ  |      | Y11 |
 | Y7  | MISO    |      | SDA    | I2C  | Y10 |
 | Y8  | MOSI    | SPI  | SCL    | I2C  | Y9  |
 
-The `PWR` signal enables power to the display and should be assigned to an
-arbitrary I/O pin. The display board has no I2C pullups. If the target does not
-have them, pullups to 3.3V on `SDA` and `SCL` are essential. Values are not
-critical - 1.5KΩ to 4.7KΩ are typical.
+The `PWR` signal enables power to the display by turning on the internal LDO
+3.3V regulator. It should be assigned to an arbitrary I/O pin. In testing I
+found it necessary to assert `PWR` and wait before instantiating the display
+(see code below). The display board has no I2C pullups. If the target lacks
+them, pullups to 3.3V on `SDA` and `SCL` are essential. Values are uncritical:
+1.5KΩ to 4.7KΩ are typical.
 
-This code from `lcd_local_esp.py` works on the reference board:
+Note on the SPI interface: the LCD160CR hardware does not implement `MISO`: SPI
+is from target to display only. Nor does it
+[implement `SS\`](https://github.com/micropython/micropython/issues/6663) (also
+known as `CS\`) which means it requires exclusive access to the SPI bus.
+
+The ESP32 allows arbitrary pin assignments, but
+[the docs](http://docs.micropython.org/en/latest/esp32/quickref.html#hardware-spi-bus)
+recommend hardware SPI on default pins for performance and reliability. Owing
+to the limited performance of I2C I would expect any pin configuration to work
+with this interface but I haven't tested this.
+
+I tested with this wiring. The ESP column represents ESP32 GPIO numbers, the
+Pin column represents the name of the downward facing pin on the display. This
+is the Pyboard pin it would mate with, not the names on the silkscreen which
+refer to edge connectors. Once again this is the view looking down on the
+display with the 10-way black edge connector at the top.
+
+| Pin | Signal | ESP  | Signal | ESP  | Pin |
+|:---:|:------:|:----:|:------:|:----:|:---:|
+| Y1  |        |      | Vin    | 5V   | Vin |
+| Y2  |        |      |        |      |     |
+| Y3  |        |      | Gnd    | Gnd  | Gnd |
+| Y4  | PWR    | 25   |        |      | Rst |
+| Y5  |        |      |        |      | Y12 |
+| Y6  | SCK    | 14   |        |      | Y11 |
+| Y7  |        |      | SDA    | 19   | Y10 |
+| Y8  | MOSI   | 13   | SCL    | 18   | Y9  |
+
+This code works on the reference board wired as above:
 ```python
 from gui.core import lcd160cr
 from gui.core.lcd160_gui import Screen, LCD160CR_G
+from gui.widgets.label import Label
+import font10
 
+from time import sleep_ms
 from machine import Pin, I2C, SPI
 
-def setup():
+class BaseScreen(Screen):
+    def __init__(self):
+        super().__init__()
+        Label((0, 0), font = font10, value = 'Hello world')
+
+def main():
     pwr = Pin(25, Pin.OUT)
+    pwr(1)
+    sleep_ms(100)  # Ensure device is ready
     # Hardware SPI on native pins for performance
     spi = SPI(1, 10_000_000, sck=Pin(14), mosi=Pin(13), miso=Pin(12))
-    i2c = I2C(1, scl=Pin(32), sda=Pin(33), freq=1_000_000)
+    i2c = I2C(0, freq=1_000_000)  # scl=Pin(18), sda=Pin(19)
     lcd = LCD160CR_G(pwr=pwr, spi=spi, i2c=i2c)  # Set connection
     lcd.set_orient(lcd160cr.LANDSCAPE)  # and orientation
     Screen.setup(lcd)
-```
-I experienced problems specifying different pins for I2C. The
-[manual](http://docs.micropython.org/en/latest/esp32/quickref.html#hardware-i2c-bus)
-indicates that pins 18 and 19 can be used, but I experienced timeout errors
-with these pins.
+    Screen.change(BaseScreen)
 
+main()
+```
 To install the library on ESP32 the file `lcd_local_esp.py` should be copied to
 `/pyboard/lcd_local.py` after making any edits to support your physical
 connection and maximum font size.
 
 The supplied [framebuf_utils.mpy](./README.md#15-a-performance-boost) will
 produce a harmless warning message because the supplied example is compiled for
-STM architecture. To enable fast text rendering it is necessary to recompile
-for `xtensawin`.
+STM architecture. To enable fast text rendering on ESP32 it is necessary to
+recompile `framebuf_utils.mpy` for `xtensawin`. This is discussed
+[here](https://github.com/peterhinch/micropython-font-to-py/blob/master/writer/WRITER.md#224-a-performance-boost).
+
+When instantiating I2C and SPI buses on default pins, the I2C constructor does
+not require the pins to be explicitly specified. The SPI constructor does. The
+docs don't explicitly state this, but the provided code examples illustrate it.
 
 ### Debug notes
 
 If changing the pins or migrating to a different target the following errors
 can occur.
- * ENOENT or timeout exception: I2C problem. Check pullups.
- * Blank display: check the pwr pin.
+ * ENOENT or timeout exception: I2C problem. Check wiring, pullups and pwr
+ state.
+ * Blank display: check power connections and the pwr pin.
  * The GUI works but lacks text on buttons. Meters and sliders show
  corruption: this is an SPI problem.
